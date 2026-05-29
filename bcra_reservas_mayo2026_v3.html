@@ -1,0 +1,271 @@
+
+<style>
+  .dash { font-family: var(--font-sans); padding: 0; }
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--color-text-tertiary); text-transform: uppercase; margin: 0 0 8px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 20px; }
+  .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: var(--color-text-tertiary); margin: 0 0 4px; }
+  .metric-value { font-size: 20px; font-weight: 500; color: var(--color-text-primary); margin: 0; line-height: 1.2; }
+  .metric-sub { font-size: 11px; color: var(--color-text-secondary); margin: 3px 0 0; }
+  .accent-pos { color: #1D9E75; }
+  .accent-neg { color: #D85A30; }
+  .accent-warn { color: #BA7517; }
+  .chart-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px 20px; margin-bottom: 16px; }
+  .chart-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; }
+  .chart-sub { font-size: 11px; color: var(--color-text-secondary); margin: 0 0 14px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; font-size: 11px; color: var(--color-text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .lsq { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .lline { width: 18px; height: 2px; display: inline-block; border-radius: 1px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .footer-note { font-size: 10px; color: var(--color-text-tertiary); margin-top: 6px; }
+  .progress-wrap { margin: 8px 0 4px; }
+  .progress-bar-bg { background: var(--color-background-secondary); border-radius: 99px; height: 10px; width: 100%; overflow: hidden; }
+  .progress-bar-fill { background: #185FA5; height: 10px; border-radius: 99px; transition: width 1s ease; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-tertiary); margin-top: 4px; }
+</style>
+
+<div class="dash">
+  <h2 class="sr-only">Panel BCRA: reservas, compras y tipo de cambio — mayo 2026</h2>
+
+  <p class="section-label">Resumen del día · 29 de mayo de 2026</p>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <p class="metric-label">Reservas brutas</p>
+      <p class="metric-value">u$s 48.191 M</p>
+      <p class="metric-sub accent-neg">▼ u$s 320 M hoy</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Suba en mayo</p>
+      <p class="metric-value accent-pos">+u$s 3.708 M</p>
+      <p class="metric-sub">Mayor alza mensual 2026</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Compras BCRA mayo</p>
+      <p class="metric-value">u$s 2.596 M</p>
+      <p class="metric-sub">u$s 70 M solo hoy</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Dólar mayorista</p>
+      <p class="metric-value">$1.408</p>
+      <p class="metric-sub">21,7% bajo el techo de banda</p>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <p class="chart-title">Compras netas acumuladas BCRA — avance hacia u$s 10.000 M</p>
+    <p class="chart-sub">Suma acumulada en el año y compra mensual por mes. En millones de dólares.</p>
+    <div class="legend">
+      <span><span class="lline" style="background:#185FA5"></span>Acumulado anual</span>
+      <span><span class="lsq" style="background:#9FE1CB"></span>Compra mensual</span>
+      <span><span class="lline" style="background:#D85A30; border-top: 2px dashed #D85A30; height:0; margin-top:5px;"></span>Meta u$s 10.000 M</span>
+    </div>
+    <div style="position: relative; width: 100%; height: 260px;">
+      <canvas id="acumChart" role="img" aria-label="Compras acumuladas BCRA 2026. Enero 1157, Febrero 2712, Marzo 4382, Abril 7151, Mayo 9747 millones. Meta: 10000 millones.">Enero 1157, Febrero 2712, Marzo 4382, Abril 7151, Mayo 9747 millones acumulados. Faltan u$s 253 M para los 10.000 M.</canvas>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progBar" style="width: 0%"></div>
+      </div>
+      <div class="progress-labels">
+        <span>u$s 0</span>
+        <span id="progPct" style="font-weight:500; color: var(--color-text-primary);">97,5% completado — faltan u$s 253 M</span>
+        <span>u$s 10.000 M</span>
+      </div>
+    </div>
+
+    <p class="footer-note">Fuente: BCRA / Ámbito · Datos al 29/05/2026</p>
+  </div>
+
+  <div class="grid2">
+    <div class="chart-wrap" style="margin-bottom:0">
+      <p class="chart-title">Variación mensual de reservas brutas — 2026</p>
+      <p class="chart-sub">En millones de dólares.</p>
+      <div class="legend">
+        <span><span class="lsq" style="background:#1D9E75"></span>Suba</span>
+        <span><span class="lsq" style="background:#D85A30"></span>Caída</span>
+      </div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="resChart" role="img" aria-label="Variación mensual de reservas en 2026. Enero +3337, Febrero +1058, Marzo -3469, Abril +2392, Mayo +3708.">Enero +3337, Febrero +1058, Marzo -3469, Abril +2392, Mayo +3708.</canvas>
+      </div>
+    </div>
+
+    <div class="chart-wrap" style="margin-bottom:0">
+      <p class="chart-title">Cotizaciones del dólar al cierre de mayo</p>
+      <p class="chart-sub">Pesos argentinos. Spread entre segmentos.</p>
+      <div class="legend">
+        <span><span class="lsq" style="background:#534AB7"></span>Tipo de cambio</span>
+        <span><span class="lsq" style="background:#BA7517"></span>Tarjeta</span>
+      </div>
+      <div style="position: relative; width: 100%; height: 200px;">
+        <canvas id="fxChart" role="img" aria-label="Tipos de cambio. Mayorista 1408, Minorista 1430, MEP 1435, Blue 1430, CCL 1509, Tarjeta 1859.">Mayorista 1408, Minorista 1430, MEP 1435, Blue 1430, CCL 1509, Tarjeta 1859.</canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+const tickColor = isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)';
+
+const mensual = [1157, 1555, 1670, 2769, 2596];
+const acumulado = [1157, 1157+1555, 1157+1555+1670, 1157+1555+1670+2769, 1157+1555+1670+2769+2596];
+const labels = ['Enero','Febrero','Marzo','Abril','Mayo'];
+const META = 10000;
+
+new Chart(document.getElementById('acumChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
+        type: 'line',
+        label: 'Acumulado anual',
+        data: acumulado,
+        borderColor: '#185FA5',
+        backgroundColor: 'rgba(24,95,165,0.08)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#185FA5',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        fill: true,
+        tension: 0.3,
+        yAxisID: 'y',
+        order: 1
+      },
+      {
+        type: 'bar',
+        label: 'Compra mensual',
+        data: mensual,
+        backgroundColor: isDark ? '#085041' : '#9FE1CB',
+        borderRadius: 4,
+        borderSkipped: false,
+        yAxisID: 'y',
+        order: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      annotation: {},
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            if (ctx.dataset.label === 'Acumulado anual') return 'Acumulado: u$s ' + ctx.raw.toLocaleString('es-AR') + ' M';
+            return 'Mensual: u$s ' + ctx.raw.toLocaleString('es-AR') + ' M';
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: tickColor, font: { size: 11 } },
+        grid: { display: false },
+        border: { display: false }
+      },
+      y: {
+        min: 0,
+        max: 11000,
+        ticks: {
+          color: tickColor,
+          font: { size: 10 },
+          callback: v => (v/1000).toFixed(0) + 'k'
+        },
+        grid: { color: gridColor },
+        border: { display: false }
+      }
+    }
+  },
+  plugins: [{
+    id: 'metaLine',
+    afterDraw(chart) {
+      const { ctx, scales: { y, x } } = chart;
+      const yPos = y.getPixelForValue(META);
+      const left = x.left;
+      const right = x.right;
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = '#D85A30';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(left, yPos);
+      ctx.lineTo(right, yPos);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#D85A30';
+      ctx.font = '500 10px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('Meta u$s 10.000 M', right, yPos - 5);
+      ctx.restore();
+    }
+  }, {
+    id: 'labelPoints',
+    afterDraw(chart) {
+      const { ctx, scales: { y, x } } = chart;
+      const ds = chart.data.datasets[0];
+      const meta = chart.getDatasetMeta(0);
+      ctx.save();
+      ctx.font = '500 10px sans-serif';
+      ctx.fillStyle = '#185FA5';
+      ctx.textAlign = 'center';
+      meta.data.forEach((pt, i) => {
+        const val = ds.data[i];
+        const label = (val/1000).toFixed(1) + 'k';
+        ctx.fillText(label, pt.x, pt.y - 10);
+      });
+      ctx.restore();
+    }
+  }]
+});
+
+setTimeout(() => {
+  document.getElementById('progBar').style.width = '97.5%';
+}, 300);
+
+const resData = [3337, 1058, -3469, 2392, 3708];
+const resColors = resData.map(v => v >= 0 ? '#1D9E75' : '#D85A30');
+new Chart(document.getElementById('resChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Ene','Feb','Mar','Abr','May'],
+    datasets: [{ data: resData, backgroundColor: resColors, borderRadius: 4, borderSkipped: false }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => (ctx.raw >= 0 ? '+' : '') + 'u$s ' + ctx.raw.toLocaleString('es-AR') + ' M' }
+    }},
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 11 } }, grid: { display: false }, border: { display: false } },
+      y: { ticks: { color: tickColor, font: { size: 10 }, callback: v => (v/1000).toFixed(1) + 'k' }, grid: { color: gridColor }, border: { display: false } }
+    }
+  }
+});
+
+const fxValues = [1408, 1430, 1435, 1430, 1509, 1859];
+const fxColors = fxValues.map((v,i) => i === 5 ? '#BA7517' : i === 4 ? '#7F77DD' : '#534AB7');
+new Chart(document.getElementById('fxChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Mayorista','Minorista','MEP','Blue','CCL','Tarjeta'],
+    datasets: [{ data: fxValues, backgroundColor: fxColors, borderRadius: 4, borderSkipped: false }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: { label: ctx => '$' + ctx.raw.toLocaleString('es-AR') }
+    }},
+    scales: {
+      x: { ticks: { color: tickColor, font: { size: 10 }, autoSkip: false, maxRotation: 30 }, grid: { display: false }, border: { display: false } },
+      y: { min: 1300, ticks: { color: tickColor, font: { size: 10 }, callback: v => '$' + (v/1000).toFixed(1) + 'k' }, grid: { color: gridColor }, border: { display: false } }
+    }
+  }
+});
+</script>
