@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCRA · Reservas y Compras · Mayo 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-dark:   #0C447C;
+    --blue-mid:    #185FA5;
+    --blue-light:  #B5D4F4;
+    --blue-pale:   #E6F1FB;
+    --teal:        #1D9E75;
+    --teal-pale:   #E1F5EE;
+    --coral:       #D85A30;
+    --coral-pale:  #FAECE7;
+    --amber:       #BA7517;
+    --purple:      #534AB7;
+    --gray-50:     #F7F6F2;
+    --gray-100:    #EBEBEB;
+    --gray-300:    #B4B2A9;
+    --gray-700:    #444441;
+    --gray-900:    #1A1A18;
+    --text-primary:   #1A1A18;
+    --text-secondary: #5F5E5A;
+    --text-muted:     #888780;
+    --border:      rgba(0,0,0,0.08);
+    --grid-line:   rgba(0,0,0,0.05);
+    --tick-color:  rgba(0,0,0,0.4);
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: #F4F2ED;
+    color: var(--text-primary);
+    padding: 20px;
+    min-height: 100vh;
+  }
+
+  .dashboard {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    border-top: 3px solid var(--blue-dark);
+    padding-top: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .header-left {}
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--blue-mid);
+    margin-bottom: 4px;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+  .header-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    margin-top: 4px;
+  }
+  .source-badge {
+    font-size: 10px;
+    background: var(--gray-100);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  /* Metric cards */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .metric-card {
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .metric-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+  }
+  .metric-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .metric-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .pos { color: var(--teal); }
+  .neg { color: var(--coral); }
+
+  /* Chart cards */
+  .chart-card {
+    background: #fff;
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+  }
+  .chart-header { margin-bottom: 12px; }
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .chart-subtitle {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .lsq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .ldash {
+    width: 18px; height: 0;
+    border-top: 2px dashed var(--coral);
+    flex-shrink: 0;
+  }
+  .lline {
+    width: 18px; height: 2px;
+    background: var(--blue-mid);
+    border-radius: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Progress bar */
+  .progress-section { margin-top: 14px; }
+  .progress-bar-bg {
+    background: #F0EEE8;
+    border-radius: 99px;
+    height: 10px;
+    width: 100%;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    background: linear-gradient(90deg, var(--blue-mid), var(--blue-dark));
+    height: 10px;
+    border-radius: 99px;
+    width: 0%;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 5px;
+  }
+  .progress-highlight {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    color: var(--blue-dark);
+  }
+
+  /* Two-col grid */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 0.5px solid var(--border);
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 600px) {
+    .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    .header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <div class="header">
+    <div class="header-left">
+      <p class="eyebrow">BCRA · Mercado de Cambios</p>
+      <h1>Reservas y compras netas<br>en máximos del año</h1>
+    </div>
+    <div style="text-align:right">
+      <p class="header-date">29 · 05 · 2026</p>
+      <span class="source-badge">Fuente: BCRA / Ámbito</span>
+    </div>
+  </div>
+
+  <!-- Metric cards -->
+  <div class="metric-grid">
+    <div class="metric-card">
+      <p class="metric-label">Reservas brutas</p>
+      <p class="metric-value">u$s 48.191 M</p>
+      <p class="metric-sub neg">▼ u$s 320 M en el día</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Suba en mayo</p>
+      <p class="metric-value pos">+u$s 3.708 M</p>
+      <p class="metric-sub">Mayor alza mensual 2026</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Compras BCRA mayo</p>
+      <p class="metric-value">u$s 2.596 M</p>
+      <p class="metric-sub">u$s 70 M solo hoy</p>
+    </div>
+    <div class="metric-card">
+      <p class="metric-label">Dólar mayorista</p>
+      <p class="metric-value">$ 1.408</p>
+      <p class="metric-sub">21,7% bajo el techo de banda</p>
+    </div>
+  </div>
+
+  <!-- Main chart: acumulado + mensual -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <p class="chart-title">Compras netas BCRA — avance hacia u$s 10.000 M</p>
+      <p class="chart-subtitle">Acumulado anual (línea) y compra mensual (barras). En millones de dólares.</p>
+    </div>
+    <div class="legend">
+      <span class="legend-item"><span class="lline"></span>Acumulado anual</span>
+      <span class="legend-item"><span class="lsq" style="background:#9FE1CB"></span>Compra mensual</span>
+      <span class="legend-item"><span class="ldash"></span>Meta u$s 10.000 M</span>
+    </div>
+    <div style="position:relative;width:100%;height:260px;">
+      <canvas id="acumChart"
+        role="img"
+        aria-label="Compras acumuladas BCRA 2026. Enero 1157, Febrero 2712, Marzo 4382, Abril 7151, Mayo 9747 millones. Meta 10000 millones.">
+        Enero 1157, Febrero 2712, Marzo 4382, Abril 7151, Mayo 9747 millones acumulados.
+      </canvas>
+    </div>
+    <div class="progress-section">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progBar"></div>
+      </div>
+      <div class="progress-labels">
+        <span>u$s 0</span>
+        <span class="progress-highlight">97,5% completado — faltan u$s 253 M</span>
+        <span>u$s 10.000 M</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom two charts -->
+  <div class="grid2">
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-header">
+        <p class="chart-title">Variación mensual de reservas brutas</p>
+        <p class="chart-subtitle">Mayo cierra como el mejor mes de 2026. En millones de u$s.</p>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="lsq" style="background:#1D9E75"></span>Suba</span>
+        <span class="legend-item"><span class="lsq" style="background:#D85A30"></span>Caída</span>
+      </div>
+      <div style="position:relative;width:100%;height:200px;">
+        <canvas id="resChart"
+          role="img"
+          aria-label="Variación mensual reservas. Enero +3337, Febrero +1058, Marzo -3469, Abril +2392, Mayo +3708.">
+          Enero +3337, Febrero +1058, Marzo -3469, Abril +2392, Mayo +3708 millones.
+        </canvas>
+      </div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom:0">
+      <div class="chart-header">
+        <p class="chart-title">Cotizaciones del dólar al cierre</p>
+        <p class="chart-subtitle">Spread entre segmentos al 29/05/2026. En pesos.</p>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="lsq" style="background:#534AB7"></span>Cambio oficial/paralelo</span>
+        <span class="legend-item"><span class="lsq" style="background:#BA7517"></span>Tarjeta</span>
+      </div>
+      <div style="position:relative;width:100%;height:200px;">
+        <canvas id="fxChart"
+          role="img"
+          aria-label="Tipos de cambio. Mayorista 1408, Minorista 1430, MEP 1435, Blue 1430, CCL 1509, Tarjeta 1859.">
+          Mayorista 1408, Minorista 1430, MEP 1435, Blue 1430, CCL 1509, Tarjeta 1859.
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Elaboración propia en base a datos del BCRA y Ámbito · 29/05/2026</span>
+    <span>Los datos de reservas pueden diferir por ajustes de valuación intradía</span>
+  </div>
+
+</div>
+
+<script>
+  const gridColor = 'rgba(0,0,0,0.05)';
+  const tickColor = 'rgba(0,0,0,0.38)';
+
+  // --- Chart 1: Acumulado + Mensual ---
+  const mensual  = [1157, 1555, 1670, 2769, 2596];
+  const acum = mensual.reduce((acc, v, i) => {
+    acc.push((acc[i - 1] || 0) + v);
+    return acc;
+  }, []);
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo'];
+  const META = 10000;
+
+  new Chart(document.getElementById('acumChart'), {
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Acumulado anual',
+          data: acum,
+          borderColor: '#185FA5',
+          backgroundColor: 'rgba(24,95,165,0.07)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#185FA5',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          fill: true,
+          tension: 0.35,
+          order: 1
+        },
+        {
+          type: 'bar',
+          label: 'Compra mensual',
+          data: mensual,
+          backgroundColor: '#9FE1CB',
+          borderRadius: 4,
+          borderSkipped: false,
+          order: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label === 'Acumulado anual'
+              ? 'Acumulado: u$s ' + ctx.raw.toLocaleString('es-AR') + ' M'
+              : 'Mensual: u$s ' + ctx.raw.toLocaleString('es-AR') + ' M'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor, font: { size: 11, family: "'IBM Plex Sans', sans-serif" } },
+          grid: { display: false },
+          border: { display: false }
+        },
+        y: {
+          min: 0, max: 11000,
+          ticks: {
+            color: tickColor,
+            font: { size: 10 },
+            callback: v => (v / 1000).toFixed(0) + 'k'
+          },
+          grid: { color: gridColor },
+          border: { display: false }
+        }
+      }
+    },
+    plugins: [
+      {
+        id: 'metaLine',
+        afterDraw(chart) {
+          const { ctx, scales: { y, x } } = chart;
+          const yPos = y.getPixelForValue(META);
+          ctx.save();
+          ctx.setLineDash([6, 4]);
+          ctx.strokeStyle = '#D85A30';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(x.left, yPos);
+          ctx.lineTo(x.right, yPos);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#D85A30';
+          ctx.font = "500 10px 'IBM Plex Sans', sans-serif";
+          ctx.textAlign = 'right';
+          ctx.fillText('Meta u$s 10.000 M', x.right, yPos - 5);
+          ctx.restore();
+        }
+      },
+      {
+        id: 'acumLabels',
+        afterDraw(chart) {
+          const { ctx } = chart;
+          const meta = chart.getDatasetMeta(0);
+          const ds = chart.data.datasets[0];
+          ctx.save();
+          ctx.font = "500 10px 'IBM Plex Mono', monospace";
+          ctx.fillStyle = '#0C447C';
+          ctx.textAlign = 'center';
+          meta.data.forEach((pt, i) => {
+            const val = ds.data[i];
+            ctx.fillText((val / 1000).toFixed(1) + 'k', pt.x, pt.y - 10);
+          });
+          ctx.restore();
+        }
+      }
+    ]
+  });
+
+  // Progress bar animation on load
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('progBar').style.width = '97.5%';
+    }, 400);
+  });
+
+  // --- Chart 2: Variación mensual reservas ---
+  const resData   = [3337, 1058, -3469, 2392, 3708];
+  const resColors = resData.map(v => v >= 0 ? '#1D9E75' : '#D85A30');
+
+  new Chart(document.getElementById('resChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Ene','Feb','Mar','Abr','May'],
+      datasets: [{
+        data: resData,
+        backgroundColor: resColors,
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => (ctx.raw >= 0 ? '+' : '') + 'u$s ' + ctx.raw.toLocaleString('es-AR') + ' M'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor, font: { size: 11 } },
+          grid: { display: false },
+          border: { display: false }
+        },
+        y: {
+          ticks: {
+            color: tickColor,
+            font: { size: 10 },
+            callback: v => (v >= 0 ? '+' : '') + (v / 1000).toFixed(1) + 'k'
+          },
+          grid: { color: gridColor },
+          border: { display: false }
+        }
+      }
+    }
+  });
+
+  // --- Chart 3: FX ---
+  const fxValues = [1408, 1430, 1435, 1430, 1509, 1859];
+  const fxColors = ['#534AB7','#534AB7','#7F77DD','#534AB7','#7F77DD','#BA7517'];
+
+  new Chart(document.getElementById('fxChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Mayorista','Minorista','MEP','Blue','CCL','Tarjeta'],
+      datasets: [{
+        data: fxValues,
+        backgroundColor: fxColors,
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => '$' + ctx.raw.toLocaleString('es-AR')
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: tickColor, font: { size: 10 }, autoSkip: false, maxRotation: 30 },
+          grid: { display: false },
+          border: { display: false }
+        },
+        y: {
+          min: 1300,
+          ticks: {
+            color: tickColor,
+            font: { size: 10 },
+            callback: v => '$' + (v / 1000).toFixed(1) + 'k'
+          },
+          grid: { color: gridColor },
+          border: { display: false }
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>
