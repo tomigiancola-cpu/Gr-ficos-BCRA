@@ -6,29 +6,31 @@
 <title>Reservas brutas y compras del BCRA</title>
 <style>
   #bcra-widget * { box-sizing: border-box; margin: 0; padding: 0; }
-  #bcra-widget { font-family: Georgia, 'Times New Roman', serif; max-width: 720px; margin: 0 auto; color: #1a1a1a; background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 20px; }
-  #bcra-widget .bw-head { border-bottom: 2px solid #0a3d62; padding-bottom: 12px; margin-bottom: 16px; }
-  #bcra-widget .bw-kicker { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0a3d62; font-family: Arial, sans-serif; }
-  #bcra-widget .bw-title { font-size: 21px; font-weight: 700; line-height: 1.2; margin-top: 4px; color: #111; }
-  #bcra-widget .bw-date { font-size: 12px; color: #777; font-family: Arial, sans-serif; margin-top: 4px; }
-  #bcra-widget .bw-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
-  #bcra-widget .bw-kpi { background: #f5f7fa; border-radius: 5px; padding: 10px 12px; }
-  #bcra-widget .bw-kpi-lbl { font-size: 9.5px; color: #6b7785; text-transform: uppercase; letter-spacing: .04em; font-family: Arial, sans-serif; font-weight: 700; }
-  #bcra-widget .bw-kpi-val { font-size: 18px; font-weight: 700; color: #0a3d62; line-height: 1.15; margin-top: 3px; font-family: Arial, sans-serif; }
-  #bcra-widget .bw-kpi-sub { font-size: 11px; margin-top: 2px; font-weight: 700; font-family: Arial, sans-serif; }
+  html, body { height: 100%; }
+  body { display: flex; align-items: center; justify-content: center; padding: 8px; background: #f0f2f5; }
+  #bcra-widget { font-family: Georgia, 'Times New Roman', serif; width: 100%; max-width: 760px; max-height: calc(100vh - 16px); display: flex; flex-direction: column; color: #1a1a1a; background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 14px 18px; }
+  #bcra-widget .bw-head { border-bottom: 2px solid #0a3d62; padding-bottom: 8px; margin-bottom: 10px; }
+  #bcra-widget .bw-kicker { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0a3d62; font-family: Arial, sans-serif; }
+  #bcra-widget .bw-title { font-size: 18px; font-weight: 700; line-height: 1.15; margin-top: 3px; color: #111; }
+  #bcra-widget .bw-date { font-size: 11px; color: #777; font-family: Arial, sans-serif; margin-top: 3px; }
+  #bcra-widget .bw-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-bottom: 10px; }
+  #bcra-widget .bw-kpi { background: #f5f7fa; border-radius: 5px; padding: 7px 10px; }
+  #bcra-widget .bw-kpi-lbl { font-size: 9px; color: #6b7785; text-transform: uppercase; letter-spacing: .04em; font-family: Arial, sans-serif; font-weight: 700; }
+  #bcra-widget .bw-kpi-val { font-size: 16px; font-weight: 700; color: #0a3d62; line-height: 1.1; margin-top: 2px; font-family: Arial, sans-serif; }
+  #bcra-widget .bw-kpi-sub { font-size: 10px; margin-top: 1px; font-weight: 700; font-family: Arial, sans-serif; }
   #bcra-widget .bw-up { color: #1d9e75; } #bcra-widget .bw-down { color: #e24b4a; } #bcra-widget .bw-neutral { color: #6b7785; }
-  #bcra-widget .bw-controls { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  #bcra-widget .bw-controls { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
   #bcra-widget .bw-seg { display: inline-flex; background: #eef1f4; border-radius: 6px; padding: 2px; flex-wrap: wrap; }
-  #bcra-widget .bw-seg button { border: none; background: transparent; font-size: 12px; padding: 6px 13px; border-radius: 5px; cursor: pointer; color: #6b7785; font-family: Arial, sans-serif; font-weight: 600; transition: all .15s; }
+  #bcra-widget .bw-seg button { border: none; background: transparent; font-size: 11.5px; padding: 5px 11px; border-radius: 5px; cursor: pointer; color: #6b7785; font-family: Arial, sans-serif; font-weight: 600; transition: all .15s; }
   #bcra-widget .bw-seg button.active { background: #fff; color: #0a3d62; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
-  #bcra-widget .bw-legend { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
-  #bcra-widget .bw-lg { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 4px 10px; border-radius: 14px; border: 1px solid #dde2e8; cursor: pointer; color: #555; user-select: none; font-family: Arial, sans-serif; transition: opacity .15s; }
+  #bcra-widget .bw-legend { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  #bcra-widget .bw-lg { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 9px; border-radius: 14px; border: 1px solid #dde2e8; cursor: pointer; color: #555; user-select: none; font-family: Arial, sans-serif; transition: opacity .15s; }
   #bcra-widget .bw-lg.off { opacity: .35; }
   #bcra-widget .bw-lg-dot { width: 10px; height: 10px; border-radius: 2px; }
   #bcra-widget .bw-lg-line { width: 14px; border-top-width: 2.5px; border-top-style: solid; }
-  #bcra-widget .bw-chart { position: relative; width: 100%; height: 360px; }
-  #bcra-widget .bw-foot { font-size: 10.5px; color: #999; margin-top: 12px; font-family: Arial, sans-serif; border-top: 1px solid #eee; padding-top: 8px; }
-  @media (max-width: 520px){ #bcra-widget .bw-kpis{grid-template-columns:repeat(3,1fr);} #bcra-widget .bw-title{font-size:17px;} #bcra-widget .bw-kpi-val{font-size:15px;} }
+  #bcra-widget .bw-chart { position: relative; width: 100%; flex: 1 1 auto; min-height: 180px; }
+  #bcra-widget .bw-foot { font-size: 10px; color: #999; margin-top: 8px; font-family: Arial, sans-serif; border-top: 1px solid #eee; padding-top: 6px; }
+  @media (max-width: 520px){ #bcra-widget .bw-title{font-size:15px;} #bcra-widget .bw-kpi-val{font-size:14px;} }
 </style>
 </head>
 <body>
@@ -44,11 +46,11 @@
 
   <div class="bw-controls">
     <div class="bw-seg" id="bw-seg">
-      <button class="active" data-freq="dia">Diario</button>
+      <button data-freq="dia">Diario</button>
       <button data-freq="sem">Semanal</button>
       <button data-freq="mes">Mensual</button>
       <button data-freq="ytd">YTD 2026</button>
-      <button data-freq="anual">Anual</button>
+      <button class="active" data-freq="anual">Anual</button>
     </div>
   </div>
 
@@ -63,22 +65,22 @@
    ║  Montos en millones de u$s.                                        ║
    ╚══════════════════════════════════════════════════════════════════╝ */
 var BCRA = {
-  titulo: "El BCRA superó los u$s10.000 millones comprados en el año",
-  fecha:  "Datos al 3 de junio de 2026",
+  titulo: "Las reservas del BCRA caen por debajo de u$s48.000 millones",
+  fecha:  "Datos al 5 de junio de 2026",
 
   kpis: {
-    reservasBrutas:   48414,  // reservas brutas al 03/06
-    varReservasDia:   -13,    // variación de reservas en la rueda del 03/06
-    compraDia:        43,     // compra del BCRA el 03/06
-    comprasYTD:       10029,  // compras acumuladas en el año al 03/06
+    reservasBrutas:   47868,  // reservas brutas al 05/06
+    varReservasDia:   -501,   // variación de reservas en la rueda del 05/06
+    compraDia:        45,     // compra del BCRA el 05/06
+    comprasYTD:       10193,  // compras acumuladas en el año al 05/06
     saldoMesAnterior: 2601    // compras de mayo (PPI)
   },
 
   // DIARIO — últimas 15 ruedas hábiles hasta el 03/06
   dia: {
-    labels:  ['13/05','14/05','15/05','18/05','19/05','20/05','21/05','22/05','26/05','27/05','28/05','29/05','01/06','02/06','03/06'],
-    brutas:  [46531,46194,46024,46136,46190,46583,46751,46803,47908,47867,48511,48191,48368,48427,48414],
-    compra:  [185,140,65,153,144,328,145,139,112,132,447,70,55,175,43],
+    labels:  ['15/05','18/05','19/05','20/05','21/05','22/05','26/05','27/05','28/05','29/05','01/06','02/06','03/06','04/06','05/06'],
+    brutas:  [46024,46136,46190,46583,46751,46803,47908,47867,48511,48191,48368,48427,48414,48369,47868],
+    compra:  [65,153,144,328,145,139,112,132,447,70,55,175,43,119,45],
     barLabel:'Compra del día'
   },
 
@@ -90,7 +92,7 @@ var BCRA = {
       '06/03','13/03','20/03','27/03','31/03',
       '01/04','10/04','17/04','24/04','30/04',
       '08/05','15/05','22/05','29/05',
-      '03/06'
+      '05/06'
     ],
     brutas:  [
       44396,44607,45561,44502,
@@ -98,7 +100,7 @@ var BCRA = {
       46004,45659,43808,43712,42091,
       44427,45431,45791,46184,44483,
       46056,46024,46803,48191,
-      48414
+      47868
     ],
     compra:  [
       218,469,291,179,
@@ -106,7 +108,7 @@ var BCRA = {
       291,295,485,251,348,
       76,424,963,595,390,
       330,596,909,761,
-      273
+      437
     ],
     barLabel:'Compras de la semana'
   },
@@ -114,24 +116,24 @@ var BCRA = {
   // MENSUAL — reservas al cierre del mes y compras del mes
   mes: {
     labels:  ['Ene','Feb','Mar','Abr','May','Jun*'],
-    brutas:  [44502,45560,42091,44483,48191,48414],
-    compra:  [1157,1555,1670,2769,2601,273],
+    brutas:  [44502,45560,42091,44483,48191,47868],
+    compra:  [1158,1557,1671,2769,2601,437],
     barLabel:'Compras del mes'
   },
 
   // YTD 2026 — acumulado de compras mes a mes
   ytd: {
     labels:  ['Ene','Feb','Mar','Abr','May','Jun*'],
-    brutas:  [44502,45560,42091,44483,48191,48414],
-    compraAcum:[1157,2712,4382,7151,9752,10029],
+    brutas:  [44502,45560,42091,44483,48191,47868],
+    compraAcum:[1158,2715,4386,7155,9756,10193],
     barLabel:'Compras acumuladas YTD'
   },
 
   // ANUAL — cierre de cada año y compras netas
   anual: {
-    labels:  ['2019','2020','2021','2022','2023','2024','2025','2026*'],
-    brutas:  [44800,39400,39600,44600,21209,29600,41100,48414],
-    compra:  [null,null,null,null,null,18900,15000,10029],
+    labels:  ['2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026*'],
+    brutas:  [14119,19646,28077,32037,46166,46386,47967,52190,46376,43290,30600,31407,25563,39308,55055,65786,44848,39387,39662,44598,23073,29640,41095,47868],
+    compra:  [5684,7918,10554,14166,10474,-745,3125,11805,3335,9200,-5362,5630,-8074,3536,-88,-15968,-3182,-4169,5049,5824,488,18710,198,10193],
     barLabel:'Compras netas del año'
   }
 };
@@ -151,8 +153,8 @@ var BCRA = {
   var k=BCRA.kpis;
   var kpis=[
     { lbl:'Reservas brutas', val:'u$s '+k.reservasBrutas.toLocaleString('es-AR')+'M', sub:arrow(k.varReservasDia)+' u$s '+Math.abs(k.varReservasDia).toLocaleString('es-AR')+'M día', cls:k.varReservasDia>=0?'bw-up':'bw-down' },
-    { lbl:'Compra del día', val:'u$s '+k.compraDia.toLocaleString('es-AR')+'M', sub:'inicio de junio', cls:'bw-up' },
-    { lbl:'Compras 2026 YTD', val:'u$s '+k.comprasYTD.toLocaleString('es-AR')+'M', sub:'cerca de la meta de u$s10.000M', cls:'bw-up' }
+    { lbl:'Compra del día', val:'u$s '+k.compraDia.toLocaleString('es-AR')+'M', sub:'rueda del 05/06', cls:'bw-up' },
+    { lbl:'Compras 2026 YTD', val:'u$s '+k.comprasYTD.toLocaleString('es-AR')+'M', sub:'por encima de u$s10.000M', cls:'bw-up' }
   ];
   document.getElementById('bw-kpis').innerHTML=kpis.map(function(x){
     return '<div class="bw-kpi"><div class="bw-kpi-lbl">'+x.lbl+'</div><div class="bw-kpi-val">'+x.val+'</div><div class="bw-kpi-sub '+x.cls+'">'+x.sub+'</div></div>';
@@ -162,7 +164,7 @@ var BCRA = {
     { key:'brutas', label:'Reservas brutas', type:'line', color:COL.brutas, axis:'y',  width:2.6 },
     { key:'compra', label:'Compras',         type:'bar',  color:COL.compra, axis:'y2', width:0 }
   ];
-  var freq='dia', visible={brutas:true,compra:true}, chart;
+  var freq='anual', visible={brutas:true,compra:true}, chart;
   function curr(){ return BCRA[freq]; }
   // la serie de barras puede llamarse 'compra' o 'compraAcum'
   function barData(){ var d=curr(); return d.compra!==undefined ? d.compra : d.compraAcum; }
@@ -203,9 +205,9 @@ var BCRA = {
           tooltip:{ backgroundColor:'#fff', titleColor:'#111', bodyColor:'#444', borderColor:'rgba(0,0,0,0.1)', borderWidth:1, padding:10, cornerRadius:6, boxPadding:4, usePointStyle:true, titleFont:{family:'Arial'}, bodyFont:{family:'Arial'}, callbacks:{ label:function(c){ return ' '+c.dataset.label+': '+fmt(c.parsed.y); } } }
         },
         scales:{
-          x:{ grid:{display:false}, ticks:{ color:tickCol, font:{size:11,family:'Arial'}, maxRotation:0 } },
+          x:{ grid:{display:false}, ticks:{ color:tickCol, font:{size:10,family:'Arial'}, maxRotation:(freq==='anual'?60:0), minRotation:0, autoSkip:true, maxTicksLimit:(freq==='anual'?24:13) } },
           y:{ position:'left', grid:{ color:gridCol }, border:{display:false}, ticks:{ color:tickCol, font:{size:11,family:'Arial'}, callback:function(v){ return (v/1000).toFixed(0)+'k'; } }, title:{ display:true, text:'Reservas brutas (u$sM)', color:tickCol, font:{size:10,family:'Arial'} } },
-          y2:{ position:'right', grid:{display:false}, border:{display:false}, beginAtZero:true, ticks:{ color:tickCol, font:{size:11,family:'Arial'}, callback:function(v){ return 'u$s'+Math.round(v); } }, title:{ display:true, text:curr().barLabel+' (u$sM)', color:tickCol, font:{size:10,family:'Arial'} } }
+          y2:{ position:'right', grid:{display:false}, border:{display:false}, beginAtZero:false, ticks:{ color:tickCol, font:{size:11,family:'Arial'}, callback:function(v){ return 'u$s'+Math.round(v); } }, title:{ display:true, text:curr().barLabel+' (u$sM)', color:tickCol, font:{size:10,family:'Arial'} } }
         }
       }
     });
