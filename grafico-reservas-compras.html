@@ -29,7 +29,7 @@
   #bcra-widget .bw-lg-dot { width: 10px; height: 10px; border-radius: 2px; }
   #bcra-widget .bw-lg-line { width: 14px; border-top-width: 2.5px; border-top-style: solid; }
   #bcra-widget .bw-chart { position: relative; width: 100%; flex: 1 1 auto; min-height: 180px; }
-  #bcra-widget .bw-foot { font-size: 10px; color: #999; margin-top: 8px; font-family: Arial, sans-serif; border-top: 1px solid #eee; padding-top: 6px; }
+  #bcra-widget .bw-foot { font-size: 10px; color: #999; margin-top: 8px; font-family: Arial, sans-serif; border-top: 1px solid #eee; padding-top: 6px; flex-shrink: 0; }
   @media (max-width: 520px){ #bcra-widget .bw-title{font-size:15px;} #bcra-widget .bw-kpi-val{font-size:14px;} }
 </style>
 </head>
@@ -56,6 +56,7 @@
 
   <div class="bw-legend" id="bw-legend"></div>
   <div class="bw-chart"><canvas id="bw-canvas" role="img" aria-label="Gráfico de reservas brutas y compras de divisas del BCRA en distintas escalas de tiempo"></canvas></div>
+  <div class="bw-foot">Fuente: elaboración propia en base a datos del BCRA.</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -65,22 +66,22 @@
    ║  Montos en millones de u$s.                                        ║
    ╚══════════════════════════════════════════════════════════════════╝ */
 var BCRA = {
-  titulo: "El BCRA superó los u$s500 millones comprados en junio, pero las reservas caen por cuarta rueda",
-  fecha:  "Datos al 8 de junio de 2026",
+  titulo: "El BCRA aceleró el ritmo de compras y las reservas volvieron a subir tras 5 ruedas en baja",
+  fecha:  "Datos al 9 de junio de 2026",
 
   kpis: {
-    reservasBrutas:   47798,  // reservas brutas al 08/06
-    varReservasDia:   -70,    // variación de reservas en la rueda del 08/06
-    compraDia:        71,     // compra del BCRA el 08/06
-    comprasYTD:       10264,  // compras acumuladas en el año al 08/06
+    reservasBrutas:   47832,  // reservas brutas al 09/06
+    varReservasDia:   34,     // variación de reservas en la rueda del 09/06
+    compraDia:        121,    // compra del BCRA el 09/06
+    comprasYTD:       10298,  // compras acumuladas en el año al 09/06
     saldoMesAnterior: 2601    // compras de mayo (PPI)
   },
 
   // DIARIO — últimas 15 ruedas hábiles hasta el 03/06
   dia: {
-    labels:  ['18/05','19/05','20/05','21/05','22/05','26/05','27/05','28/05','29/05','01/06','02/06','03/06','04/06','05/06','08/06'],
-    brutas:  [46136,46190,46583,46751,46803,47908,47867,48511,48191,48368,48427,48414,48369,47868,47798],
-    compra:  [153,144,328,145,139,112,132,447,70,55,175,43,119,45,71],
+    labels:  ['19/05','20/05','21/05','22/05','26/05','27/05','28/05','29/05','01/06','02/06','03/06','04/06','05/06','08/06','09/06'],
+    brutas:  [46190,46583,46751,46803,47908,47867,48511,48191,48368,48427,48414,48369,47868,47798,47832],
+    compra:  [144,328,145,139,112,132,447,70,55,175,43,119,45,71,121],
     barLabel:'Compra del día'
   },
 
@@ -92,7 +93,7 @@ var BCRA = {
       '06/03','13/03','20/03','27/03','31/03',
       '01/04','10/04','17/04','24/04','30/04',
       '08/05','15/05','22/05','29/05',
-      '05/06','08/06'
+      '05/06','09/06'
     ],
     brutas:  [
       44396,44607,45561,44502,
@@ -100,7 +101,7 @@ var BCRA = {
       46004,45659,43808,43712,42091,
       44427,45431,45791,46184,44483,
       46056,46024,46803,48191,
-      47868,47798
+      47868,47832
     ],
     compra:  [
       218,469,291,179,
@@ -108,7 +109,7 @@ var BCRA = {
       291,295,485,251,348,
       76,424,963,595,390,
       330,596,909,761,
-      437,71
+      437,192
     ],
     barLabel:'Compras de la semana'
   },
@@ -116,24 +117,24 @@ var BCRA = {
   // MENSUAL — reservas al cierre del mes y compras del mes
   mes: {
     labels:  ['Ene','Feb','Mar','Abr','May','Jun*'],
-    brutas:  [44502,45560,42091,44483,48191,47798],
-    compra:  [1158,1557,1671,2769,2601,508],
+    brutas:  [44502,45560,42091,44483,48191,47832],
+    compra:  [1158,1557,1671,2769,2601,629],
     barLabel:'Compras del mes'
   },
 
   // YTD 2026 — acumulado de compras mes a mes
   ytd: {
     labels:  ['Ene','Feb','Mar','Abr','May','Jun*'],
-    brutas:  [44502,45560,42091,44483,48191,47798],
-    compraAcum:[1158,2715,4386,7155,9756,10264],
+    brutas:  [44502,45560,42091,44483,48191,47832],
+    compraAcum:[1158,2715,4386,7155,9756,10298],
     barLabel:'Compras acumuladas YTD'
   },
 
   // ANUAL — cierre de cada año y compras netas
   anual: {
     labels:  ['2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026*'],
-    brutas:  [14119,19646,28077,32037,46166,46386,47967,52190,46376,43290,30600,31407,25563,39308,55055,65786,44848,39387,39662,44598,23073,29640,41095,47798],
-    compra:  [5684,7918,10554,14166,10474,-745,3125,11805,3335,9200,-5362,5630,-8074,3536,-88,-15968,-3182,-4169,5049,5824,488,18710,198,10264],
+    brutas:  [14119,19646,28077,32037,46166,46386,47967,52190,46376,43290,30600,31407,25563,39308,55055,65786,44848,39387,39662,44598,23073,29640,41095,47832],
+    compra:  [5684,7918,10554,14166,10474,-745,3125,11805,3335,9200,-5362,5630,-8074,3536,-88,-15968,-3182,-4169,5049,5824,488,18710,198,10298],
     barLabel:'Compras netas del año'
   }
 };
@@ -153,7 +154,7 @@ var BCRA = {
   var k=BCRA.kpis;
   var kpis=[
     { lbl:'Reservas brutas', val:'u$s '+k.reservasBrutas.toLocaleString('es-AR')+'M', sub:arrow(k.varReservasDia)+' u$s '+Math.abs(k.varReservasDia).toLocaleString('es-AR')+'M día', cls:k.varReservasDia>=0?'bw-up':'bw-down' },
-    { lbl:'Compra del día', val:'u$s '+k.compraDia.toLocaleString('es-AR')+'M', sub:'rueda del 05/06', cls:'bw-up' },
+    { lbl:'Compra del día', val:'u$s '+k.compraDia.toLocaleString('es-AR')+'M', sub:'rueda del 09/06', cls:'bw-up' },
     { lbl:'Compras 2026 YTD', val:'u$s '+k.comprasYTD.toLocaleString('es-AR')+'M', sub:'por encima de u$s10.000M', cls:'bw-up' }
   ];
   document.getElementById('bw-kpis').innerHTML=kpis.map(function(x){
