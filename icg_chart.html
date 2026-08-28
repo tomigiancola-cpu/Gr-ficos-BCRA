@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Índice de Confianza en el Gobierno (ICG) — 2001-2026</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --line-color:     #184f95;
+    --success:        #006300;
+    --critical:       #b5302f;
+    --card-bg:        #ffffff;
+    --slot-1: #2a78d6; /* De la Rúa */
+    --slot-2: #eb6834; /* Duhalde */
+    --slot-3: #1baf7a; /* N. Kirchner */
+    --slot-4: #c98a00; /* CFK I  (darkened yellow for text contrast) */
+    --slot-5: #e87ba4; /* CFK II */
+    --slot-6: #008300; /* Macri */
+    --slot-7: #4a3aa7; /* A. Fernández */
+    --slot-8: #e34948; /* Milei */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --line-color:     #86b6ef;
+      --success:        #0ca30c;
+      --critical:       #e66767;
+      --card-bg:        #232322;
+      --slot-1: #3987e5;
+      --slot-2: #d95926;
+      --slot-3: #199e70;
+      --slot-4: #c98500;
+      --slot-5: #d55181;
+      --slot-6: #1fae1f;
+      --slot-7: #9085e9;
+      --slot-8: #e66767;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --line-color:     #86b6ef;
+    --success:        #0ca30c;
+    --critical:       #e66767;
+    --card-bg:        #232322;
+    --slot-1: #3987e5;
+    --slot-2: #d95926;
+    --slot-3: #199e70;
+    --slot-4: #e0a500;
+    --slot-5: #d55181;
+    --slot-6: #1fae1f;
+    --slot-7: #9085e9;
+    --slot-8: #e66767;
+  }
+
+  * { box-sizing: border-box; }
+  .viz-root {
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 14px 14px 16px;
+    min-height: 100%;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; }
+
+  .hdr { margin-bottom: 10px; }
+  .hdr .eyebrow {
+    font-size: 10.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--text-muted); margin: 0 0 3px;
+  }
+  .hdr h1 { font-size: 16.5px; font-weight: 700; margin: 0 0 3px; letter-spacing: -0.01em; }
+  .hdr p.sub { font-size: 11.5px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+
+  .card {
+    position: relative;
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 12px 8px; margin-bottom: 8px;
+  }
+
+  /* government selector buttons */
+  .gov-buttons { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .gov-buttons button {
+    font: inherit; font-size: 10.5px; font-weight: 600; color: var(--text-secondary);
+    background: var(--page-plane); border: 1px solid var(--border); border-radius: 999px;
+    padding: 4px 10px 4px 8px; cursor: pointer; display: flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .gov-buttons button .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .gov-buttons button:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+  .gov-buttons button.active { background: var(--text-primary); border-color: var(--text-primary); color: var(--card-bg); }
+  .gov-buttons button:focus { outline: none; }
+  .gov-buttons button:focus-visible { outline: 2px solid var(--line-color); outline-offset: 1px; }
+
+  /* ribbon: passive, proportional government labels above the plot */
+  .ribbon { position: relative; height: 22px; margin-bottom: 2px; }
+  .ribbon .seg {
+    position: absolute; top: 0; height: 100%; display: flex; align-items: center;
+    font-size: 10px; font-weight: 650; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; padding-left: 4px;
+    border-left: 2px solid var(--card-bg);
+  }
+  .ribbon .seg .dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; flex: none; }
+  .ribbon .seg.narrow { font-size: 0; }
+
+  .chart-scroll { overflow-x: auto; }
+  .chart-inner { min-width: 300px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .divider { stroke: var(--baseline); stroke-width: 1; }
+  .gridline { stroke: var(--gridline); stroke-width: 1; }
+  .axis-label { fill: var(--text-muted); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+  .x-tick { fill: var(--text-muted); font-size: 10.5px; }
+  .icg-line { fill: none; stroke: var(--line-color); stroke-width: 2.25px; stroke-linejoin: round; stroke-linecap: round; }
+  .end-dot { fill: var(--line-color); stroke: var(--card-bg); stroke-width: 2px; }
+  .crosshair { stroke: var(--text-secondary); stroke-width: 1; stroke-dasharray: 2 3; opacity: 0; pointer-events: none; }
+  .hover-dot { fill: var(--line-color); stroke: var(--card-bg); stroke-width: 2px; opacity: 0; pointer-events: none; }
+  .hint { font-size: 9.5px; color: var(--text-muted); margin: 6px 0 0; line-height: 1.4; }
+
+  .tooltip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity .08s;
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.14);
+    white-space: nowrap; z-index: 5;
+  }
+  .tooltip .tt-date { color: var(--text-secondary); font-size: 11px; margin-bottom: 3px; }
+  .tooltip .tt-val { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .tooltip .tt-gov { color: var(--text-secondary); font-size: 11.5px; margin-top: 3px; display:flex; align-items:center; gap:5px;}
+  .tooltip .tt-gov .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  table.data-table th, table.data-table td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--gridline); }
+  table.data-table th { color: var(--text-secondary); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .02em; }
+  table.data-table td.num, table.data-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.data-table tr:last-child td { border-bottom: none; }
+  details { margin-top: 2px; }
+  summary { cursor: pointer; font-size: 10.5px; color: var(--text-secondary); padding: 4px 0; }
+  summary:hover { color: var(--text-primary); }
+
+  .foot {
+    font-size: 9.5px; color: var(--text-muted); line-height: 1.4; margin-top: 0;
+  }
+  .foot a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <div class="wrap">
+
+    <div class="hdr">
+      <p class="eyebrow">Universidad Di Tella · Escuela de Gobierno</p>
+      <h1>Índice de Confianza en el Gobierno (ICG), 2001–2026</h1>
+      <p class="sub">Serie mensual, escala 0–5. Las bandas marcan cada gobierno.</p>
+    </div>
+
+    <div class="card">
+      <div class="gov-buttons" id="govButtons"></div>
+      <div class="ribbon" id="ribbon"></div>
+      <div class="chart-scroll">
+        <div class="chart-inner">
+          <svg id="chart" viewBox="0 0 1040 220" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="tooltip" id="tooltip"></div>
+      <p class="hint">Elegí un gobierno para ver su evolución en detalle.</p>
+      <details>
+        <summary>Ver tabla por gobierno</summary>
+        <table class="data-table" id="dataTable"></table>
+      </details>
+      <div class="foot">Fuente: ICG, Universidad Torcuato Di Tella.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const SERIES = [{"date": "2001-11", "value": 1.036}, {"date": "2001-12", "value": 0.757}, {"date": "2002-01", "value": 1.357}, {"date": "2002-02", "value": 0.983}, {"date": "2002-03", "value": 0.862}, {"date": "2002-04", "value": 0.782}, {"date": "2002-05", "value": 0.467}, {"date": "2002-06", "value": 0.482}, {"date": "2002-07", "value": 0.404}, {"date": "2002-08", "value": 0.424}, {"date": "2002-09", "value": 0.323}, {"date": "2002-10", "value": 0.506}, {"date": "2002-11", "value": 0.718}, {"date": "2002-12", "value": 0.703}, {"date": "2003-01", "value": 0.907}, {"date": "2003-02", "value": 0.829}, {"date": "2003-03", "value": 0.886}, {"date": "2003-04", "value": 0.843}, {"date": "2003-05", "value": 1.219}, {"date": "2003-06", "value": 3.142}, {"date": "2003-07", "value": 3.2626}, {"date": "2003-08", "value": 3.1953}, {"date": "2003-09", "value": 2.8727}, {"date": "2003-10", "value": 2.921}, {"date": "2003-11", "value": 2.7847}, {"date": "2003-12", "value": 2.6528}, {"date": "2004-01", "value": 2.9855}, {"date": "2004-02", "value": 3.3164}, {"date": "2004-03", "value": 3.1416}, {"date": "2004-04", "value": 2.6781}, {"date": "2004-05", "value": 2.6353}, {"date": "2004-06", "value": 2.685}, {"date": "2004-07", "value": 2.488}, {"date": "2004-08", "value": 2.0713}, {"date": "2004-09", "value": 2.1305}, {"date": "2004-10", "value": 2.2673}, {"date": "2004-11", "value": 2.4601}, {"date": "2004-12", "value": 2.4293}, {"date": "2005-01", "value": 2.3513}, {"date": "2005-02", "value": 2.3866}, {"date": "2005-03", "value": 2.7996}, {"date": "2005-04", "value": 2.4891}, {"date": "2005-05", "value": 2.3706}, {"date": "2005-06", "value": 2.3111}, {"date": "2005-07", "value": 2.07}, {"date": "2005-08", "value": 2.4201}, {"date": "2005-09", "value": 2.1138}, {"date": "2005-10", "value": 2.1916}, {"date": "2005-11", "value": 2.4215}, {"date": "2005-12", "value": 2.2612}, {"date": "2006-01", "value": 2.6321}, {"date": "2006-02", "value": 2.6222}, {"date": "2006-03", "value": 2.7017}, {"date": "2006-04", "value": 2.5369}, {"date": "2006-05", "value": 2.4963}, {"date": "2006-06", "value": 2.6913}, {"date": "2006-07", "value": 2.5338}, {"date": "2006-08", "value": 2.412}, {"date": "2006-09", "value": 2.4807}, {"date": "2006-10", "value": 2.544}, {"date": "2006-11", "value": 2.4383}, {"date": "2006-12", "value": 2.3341}, {"date": "2007-01", "value": 2.6877}, {"date": "2007-02", "value": 2.5836}, {"date": "2007-03", "value": 2.5945}, {"date": "2007-04", "value": 2.143}, {"date": "2007-05", "value": 2.2293}, {"date": "2007-06", "value": 2.0747}, {"date": "2007-07", "value": 1.9988}, {"date": "2007-08", "value": 1.8636}, {"date": "2007-09", "value": 1.8896}, {"date": "2007-10", "value": 1.6778}, {"date": "2007-11", "value": 1.9811}, {"date": "2007-12", "value": 2.0436}, {"date": "2008-01", "value": 2.3688}, {"date": "2008-02", "value": 1.977}, {"date": "2008-03", "value": 1.8611}, {"date": "2008-04", "value": 1.7395}, {"date": "2008-05", "value": 1.3343}, {"date": "2008-06", "value": 1.2076}, {"date": "2008-07", "value": 1.2687}, {"date": "2008-08", "value": 1.3947}, {"date": "2008-09", "value": 1.4418}, {"date": "2008-10", "value": 1.3787}, {"date": "2008-11", "value": 1.4279}, {"date": "2008-12", "value": 1.3678}, {"date": "2009-01", "value": 1.5046}, {"date": "2009-02", "value": 1.3751}, {"date": "2009-03", "value": 1.3578}, {"date": "2009-04", "value": 1.3539}, {"date": "2009-05", "value": 1.3217}, {"date": "2009-06", "value": 1.3403}, {"date": "2009-07", "value": 1.2345}, {"date": "2009-08", "value": 1.111}, {"date": "2009-09", "value": 1.2237}, {"date": "2009-10", "value": 1.1458}, {"date": "2009-11", "value": 1.1586}, {"date": "2009-12", "value": 1.0443}, {"date": "2010-01", "value": 1.2593}, {"date": "2010-02", "value": 1.1872}, {"date": "2010-03", "value": 1.3373}, {"date": "2010-04", "value": 1.3902}, {"date": "2010-05", "value": 1.5919}, {"date": "2010-06", "value": 1.6098}, {"date": "2010-07", "value": 1.6868}, {"date": "2010-08", "value": 1.7965}, {"date": "2010-09", "value": 1.7713}, {"date": "2010-10", "value": 1.7037}, {"date": "2010-11", "value": 2.4219}, {"date": "2010-12", "value": 2.3362}, {"date": "2011-01", "value": 2.1637}, {"date": "2011-02", "value": 2.1786}, {"date": "2011-03", "value": 2.4237}, {"date": "2011-04", "value": 2.1863}, {"date": "2011-05", "value": 2.3389}, {"date": "2011-06", "value": 2.2944}, {"date": "2011-07", "value": 2.4784}, {"date": "2011-08", "value": 2.2462}, {"date": "2011-09", "value": 2.6406}, {"date": "2011-10", "value": 2.6209}, {"date": "2011-11", "value": 2.622}, {"date": "2011-12", "value": 2.7105}, {"date": "2012-01", "value": 2.7488}, {"date": "2012-02", "value": 2.5577}, {"date": "2012-03", "value": 2.2555}, {"date": "2012-04", "value": 1.9039}, {"date": "2012-05", "value": 2.1415}, {"date": "2012-06", "value": 1.9853}, {"date": "2012-07", "value": 1.8434}, {"date": "2012-08", "value": 1.8038}, {"date": "2012-09", "value": 1.6878}, {"date": "2012-10", "value": 1.6694}, {"date": "2012-11", "value": 1.6868}, {"date": "2012-12", "value": 1.839}, {"date": "2013-01", "value": 1.7624}, {"date": "2013-02", "value": 1.8314}, {"date": "2013-03", "value": 1.914}, {"date": "2013-04", "value": 1.7586}, {"date": "2013-05", "value": 1.4201}, {"date": "2013-06", "value": 1.7441}, {"date": "2013-07", "value": 1.679}, {"date": "2013-08", "value": 1.8688}, {"date": "2013-09", "value": 1.7716}, {"date": "2013-10", "value": 1.9765}, {"date": "2013-11", "value": 1.8472}, {"date": "2013-12", "value": 1.6809}, {"date": "2014-01", "value": 1.4625}, {"date": "2014-02", "value": 1.385}, {"date": "2014-03", "value": 1.5263}, {"date": "2014-04", "value": 1.4016}, {"date": "2014-05", "value": 1.5121}, {"date": "2014-06", "value": 1.6997}, {"date": "2014-07", "value": 1.8722}, {"date": "2014-08", "value": 1.8209}, {"date": "2014-09", "value": 1.7056}, {"date": "2014-10", "value": 1.6467}, {"date": "2014-11", "value": 1.603}, {"date": "2014-12", "value": 1.6357}, {"date": "2015-01", "value": 1.8264}, {"date": "2015-02", "value": 1.6532}, {"date": "2015-03", "value": 1.8635}, {"date": "2015-04", "value": 1.8962}, {"date": "2015-05", "value": 2.0906}, {"date": "2015-06", "value": 1.9373}, {"date": "2015-07", "value": 2.0366}, {"date": "2015-08", "value": 1.9173}, {"date": "2015-09", "value": 1.7779}, {"date": "2015-10", "value": 1.9085}, {"date": "2015-11", "value": 1.7489}, {"date": "2015-12", "value": 1.7975}, {"date": "2016-01", "value": 3.1378}, {"date": "2016-02", "value": 2.8619}, {"date": "2016-03", "value": 3.0327}, {"date": "2016-04", "value": 2.72}, {"date": "2016-05", "value": 2.6224}, {"date": "2016-06", "value": 2.6133}, {"date": "2016-07", "value": 2.7071}, {"date": "2016-08", "value": 2.5213}, {"date": "2016-09", "value": 2.5298}, {"date": "2016-10", "value": 2.6324}, {"date": "2016-11", "value": 2.5161}, {"date": "2016-12", "value": 2.4938}, {"date": "2017-01", "value": 2.4611}, {"date": "2017-02", "value": 2.3499}, {"date": "2017-03", "value": 2.3168}, {"date": "2017-04", "value": 2.6113}, {"date": "2017-05", "value": 2.5169}, {"date": "2017-06", "value": 2.2778}, {"date": "2017-07", "value": 2.2354}, {"date": "2017-08", "value": 2.5318}, {"date": "2017-09", "value": 2.855}, {"date": "2017-10", "value": 2.8276}, {"date": "2017-11", "value": 2.9667}, {"date": "2017-12", "value": 2.3635}, {"date": "2018-01", "value": 2.2784}, {"date": "2018-02", "value": 2.3201}, {"date": "2018-03", "value": 2.3216}, {"date": "2018-04", "value": 2.0653}, {"date": "2018-05", "value": 1.938}, {"date": "2018-06", "value": 2.0422}, {"date": "2018-07", "value": 2.0141}, {"date": "2018-08", "value": 1.9444}, {"date": "2018-09", "value": 1.7495}, {"date": "2018-10", "value": 1.7631}, {"date": "2018-11", "value": 1.7674}, {"date": "2018-12", "value": 1.92}, {"date": "2019-01", "value": 1.63}, {"date": "2019-02", "value": 1.79}, {"date": "2019-03", "value": 1.6}, {"date": "2019-04", "value": 1.5293}, {"date": "2019-05", "value": 1.6144}, {"date": "2019-06", "value": 1.8565}, {"date": "2019-07", "value": 1.9697}, {"date": "2019-08", "value": 2.2014}, {"date": "2019-09", "value": 1.91}, {"date": "2019-10", "value": 2.009}, {"date": "2019-11", "value": 1.9765}, {"date": "2019-12", "value": 1.9672}, {"date": "2020-01", "value": 2.3234}, {"date": "2020-02", "value": 2.2702}, {"date": "2020-03", "value": 2.2181}, {"date": "2020-04", "value": 3.2869}, {"date": "2020-05", "value": 3.0017}, {"date": "2020-06", "value": 2.7702}, {"date": "2020-07", "value": 2.5296}, {"date": "2020-08", "value": 2.3779}, {"date": "2020-09", "value": 2.266}, {"date": "2020-10", "value": 1.9923}, {"date": "2020-11", "value": 2.0193}, {"date": "2020-12", "value": 1.8539}, {"date": "2021-01", "value": 1.8751}, {"date": "2021-02", "value": 1.8166}, {"date": "2021-03", "value": 1.7839}, {"date": "2021-04", "value": 1.733}, {"date": "2021-05", "value": 1.9321}, {"date": "2021-06", "value": 1.7034}, {"date": "2021-07", "value": 1.6982}, {"date": "2021-08", "value": 1.8522}, {"date": "2021-09", "value": 1.5793}, {"date": "2021-10", "value": 1.5241}, {"date": "2021-11", "value": 1.4536}, {"date": "2021-12", "value": 1.4228}, {"date": "2022-01", "value": 1.5438}, {"date": "2022-02", "value": 1.494}, {"date": "2022-03", "value": 1.5077}, {"date": "2022-04", "value": 1.4361}, {"date": "2022-05", "value": 1.3032}, {"date": "2022-06", "value": 1.4016}, {"date": "2022-07", "value": 1.1167}, {"date": "2022-08", "value": 1.1826}, {"date": "2022-09", "value": 1.2306}, {"date": "2022-10", "value": 1.2817}, {"date": "2022-11", "value": 1.1896}, {"date": "2022-12", "value": 1.2513}, {"date": "2023-01", "value": 1.2741}, {"date": "2023-02", "value": 1.1713}, {"date": "2023-03", "value": 1.1776}, {"date": "2023-04", "value": 1.0705}, {"date": "2023-05", "value": 1.1323}, {"date": "2023-06", "value": 1.1197}, {"date": "2023-07", "value": 1.199}, {"date": "2023-08", "value": 1.266}, {"date": "2023-09", "value": 1.0323}, {"date": "2023-10", "value": 1.2228}, {"date": "2023-11", "value": 1.414}, {"date": "2023-12", "value": 2.8582}, {"date": "2024-01", "value": 2.6098}, {"date": "2024-02", "value": 2.5723}, {"date": "2024-03", "value": 2.5606}, {"date": "2024-04", "value": 2.4489}, {"date": "2024-05", "value": 2.514}, {"date": "2024-06", "value": 2.462}, {"date": "2024-07", "value": 2.3718}, {"date": "2024-08", "value": 2.5372}, {"date": "2024-09", "value": 2.1608}, {"date": "2024-10", "value": 2.425}, {"date": "2024-11", "value": 2.664}, {"date": "2024-12", "value": 2.655}, {"date": "2025-01", "value": 2.605}, {"date": "2025-02", "value": 2.558}, {"date": "2025-03", "value": 2.42}, {"date": "2025-04", "value": 2.331}, {"date": "2025-05", "value": 2.448}, {"date": "2025-06", "value": 2.336}, {"date": "2025-07", "value": 2.451}, {"date": "2025-08", "value": 2.118}, {"date": "2025-09", "value": 1.944}, {"date": "2025-10", "value": 2.1011}, {"date": "2025-11", "value": 2.4684}, {"date": "2025-12", "value": 2.4647}, {"date": "2026-01", "value": 2.3969}, {"date": "2026-02", "value": 2.3834}, {"date": "2026-03", "value": 2.3009}, {"date": "2026-04", "value": 2.023}, {"date": "2026-05", "value": 1.99}, {"date": "2026-06", "value": 2.07}, {"date": "2026-07", "value": 1.9356}, {"date": "2026-08", "value": 2.0587}];
+  const PERIODS = [{"name": "De la Rúa", "short": "De la Rúa", "start": "2001-11", "end": "2001-12", "note": "renuncia 20-dic-2001", "avg": 0.897, "min": 0.757, "max": 1.036, "n": 2}, {"name": "Eduardo Duhalde", "short": "Duhalde", "start": "2002-01", "end": "2003-05", "avg": 0.747, "min": 0.323, "max": 1.357, "n": 17}, {"name": "Néstor Kirchner", "short": "N. Kirchner", "start": "2003-06", "end": "2007-11", "avg": 2.49, "min": 1.678, "max": 3.316, "n": 54}, {"name": "Cristina Fernández de Kirchner (1)", "short": "CFK I", "start": "2007-12", "end": "2011-11", "avg": 1.714, "min": 1.044, "max": 2.641, "n": 48}, {"name": "Cristina Fernández de Kirchner (2)", "short": "CFK II", "start": "2011-12", "end": "2015-11", "avg": 1.834, "min": 1.385, "max": 2.749, "n": 48}, {"name": "Mauricio Macri", "short": "Macri", "start": "2015-12", "end": "2019-11", "avg": 2.265, "min": 1.529, "max": 3.138, "n": 48}, {"name": "Alberto Fernández", "short": "A. Fernández", "start": "2019-12", "end": "2023-11", "avg": 1.672, "min": 1.032, "max": 3.287, "n": 48}, {"name": "Javier Milei", "short": "Milei", "start": "2023-12", "end": "2026-08", "avg": 2.371, "min": 1.936, "max": 2.858, "n": 33}];
+  const SLOTS = ['--slot-1','--slot-2','--slot-3','--slot-4','--slot-5','--slot-6','--slot-7','--slot-8'];
+
+  const root = document.querySelector('.viz-root');
+  const cs = getComputedStyle(root);
+  function slotColor(i){ return cs.getPropertyValue(SLOTS[i]).trim() || getComputedStyle(root).getPropertyValue(SLOTS[i]); }
+
+  function keynum(d){ const [y,m] = d.split('-').map(Number); return y*12+m; }
+  const idx0 = keynum(SERIES[0].date);
+  SERIES.forEach((d,i)=>{ d.i = keynum(d.date) - idx0; });
+  PERIODS.forEach((p,i)=>{
+    p.slot = i;
+    p.i0 = keynum(p.start) - idx0;
+    p.i1 = keynum(p.end) - idx0;
+  });
+  const N = keynum(SERIES[SERIES.length-1].date) - idx0; // last index (full range)
+
+  const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function monthLabel(dateStr){
+    const [y,m] = dateStr.split('-').map(Number);
+    return `${MESES[m-1]}-${String(y).slice(2)}`;
+  }
+  function absToDate(abs){ const y=Math.floor((abs-1)/12), m=((abs-1)%12)+1; return {y,m}; }
+  function periodAt(i){
+    return PERIODS.find(p => i >= p.i0 && i <= p.i1) || PERIODS[PERIODS.length-1];
+  }
+  function periodsInView(i0,i1){ return PERIODS.filter(p => p.i1 >= i0 && p.i0 <= i1); }
+
+  // ---------- fixed layout ----------
+  const W = 1040, H = 220;
+  const M = { top: 10, right: 10, bottom: 24, left: 32 };
+  const plotW = W - M.left - M.right;
+  const plotH = H - M.top - M.bottom;
+
+  const svg = document.getElementById('chart');
+  const NS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function clear(g){ while (g.firstChild) g.removeChild(g.firstChild); }
+
+  // persistent groups, painted bottom-to-top once
+  const bandsG = el('g', {}); svg.appendChild(bandsG);
+  const gridG = el('g', {}); svg.appendChild(gridG);
+  const divG = el('g', {}); svg.appendChild(divG);
+  const xAxisG = el('g', {}); svg.appendChild(xAxisG);
+  const lineG = el('g', {}); svg.appendChild(lineG);
+  const crosshair = el('line', { class:'crosshair', x1:0, x2:0, y1:M.top, y2:M.top+plotH });
+  svg.appendChild(crosshair);
+  const hoverDot = el('circle', { class:'hover-dot', r: 5 });
+  svg.appendChild(hoverDot);
+  const hitRect = el('rect', { x:M.left, y:M.top, width:plotW, height:plotH, fill:'transparent' });
+  svg.appendChild(hitRect);
+
+  const tooltip = document.getElementById('tooltip');
+  const card = svg.closest('.card');
+  const ribbon = document.getElementById('ribbon');
+  const govButtons = document.getElementById('govButtons');
+
+  const FULL = { i0: 0, i1: N };
+  let view = { i0: 0, i1: N };
+  let xNow = null, yNow = null; // current scale fns, set by draw()
+
+  function niceYMax(maxVal){
+    const candidates = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+    const target = maxVal * 1.18;
+    for (const c of candidates) if (target <= c) return c;
+    return 5;
+  }
+
+  function genTicks(i0, i1){
+    const absStart = idx0 + i0, absEnd = idx0 + i1;
+    const span = i1 - i0;
+    let unit;
+    if (span >= 96) unit = 24;
+    else if (span >= 48) unit = 12;
+    else if (span >= 18) unit = 6;
+    else if (span >= 6) unit = 3;
+    else unit = 1;
+    const ticks = [];
+    for (let abs = absStart; abs <= absEnd; abs++){
+      const { y, m } = absToDate(abs);
+      let show;
+      if (unit === 24) show = (m === 1 && y % 2 === 0);
+      else if (unit === 12) show = (m === 1);
+      else if (unit === 6) show = (m === 1 || m === 7);
+      else if (unit === 3) show = (m % 3 === 1);
+      else show = true;
+      if (show) ticks.push({ abs, y, m, i: abs - idx0 });
+    }
+    return { ticks, unit };
+  }
+
+  function draw(i0, i1, opts){
+    opts = opts || {};
+    i0 = Math.max(0, Math.min(i0, N));
+    i1 = Math.max(0, Math.min(i1, N));
+    if (i1 - i0 < 1) { if (i0 > 0) i0--; else i1++; }
+    view = { i0, i1 };
+
+    const x = i => M.left + (i - i0) / (i1 - i0) * plotW;
+    const y = v => M.top + plotH - (v / yScaleMax) * plotH;
+    let visible = SERIES.filter(s => s.i >= i0 && s.i <= i1);
+    if (visible.length < 2) visible = SERIES.slice(Math.max(0, SERIES.findIndex(s=>s.i>=i0)-1), 2);
+    const maxV = Math.max(...visible.map(p => p.value));
+    const yScaleMax = niceYMax(maxV);
+    xNow = x; yNow = y;
+
+    // bands (clamped to view)
+    clear(bandsG);
+    PERIODS.forEach(p=>{
+      const bx0 = Math.max(p.i0, i0), bx1 = Math.min(p.i1 + 1, i1);
+      if (bx1 <= bx0) return;
+      const rx = x(bx0), rw = Math.max(x(bx1) - x(bx0), 0.5);
+      bandsG.appendChild(el('rect', {
+        class: 'band', x: rx.toFixed(2), y: M.top, width: rw.toFixed(2), height: plotH,
+        fill: slotColor(p.slot), 'fill-opacity': 0.13, 'data-slot': p.slot
+      }));
+    });
+
+    // gridlines + y axis
+    clear(gridG);
+    const yStep = yScaleMax <= 2 ? 0.5 : 1;
+    for (let v = 0; v <= yScaleMax + 1e-9; v += yStep){
+      gridG.appendChild(el('line', { class:'gridline', x1:M.left, x2:W-M.right, y1:y(v).toFixed(2), y2:y(v).toFixed(2) }));
+      const t = el('text', { class:'axis-label', x: M.left-8, y: (y(v)+3).toFixed(2), 'text-anchor':'end' });
+      t.textContent = (yStep < 1 ? v.toFixed(1) : String(v));
+      gridG.appendChild(t);
+    }
+
+    // dividers
+    clear(divG);
+    PERIODS.forEach(p=>{
+      if (p.i0 <= i0 || p.i0 > i1) return;
+      const dx = x(p.i0);
+      divG.appendChild(el('line', { class:'divider', x1:dx.toFixed(2), x2:dx.toFixed(2), y1:M.top, y2:M.top+plotH }));
+    });
+
+    // x axis ticks
+    clear(xAxisG);
+    const { ticks, unit } = genTicks(i0, i1);
+    ticks.forEach((t,ti)=>{
+      const tx = x(t.i);
+      const label = unit >= 12 ? String(t.y) : `${MESES[t.m-1]}-${String(t.y).slice(2)}`;
+      let anchor = 'middle';
+      if (tx < M.left + 16) anchor = 'start';
+      else if (tx > M.left + plotW - 16) anchor = 'end';
+      const el2 = el('text', { class:'x-tick', x: tx.toFixed(2), y: H-M.bottom+16, 'text-anchor':anchor });
+      el2.textContent = label;
+      xAxisG.appendChild(el2);
+    });
+
+    // line + end marker
+    clear(lineG);
+    let d = '';
+    visible.forEach((pt,i)=>{
+      const cmd = i===0 ? 'M' : 'L';
+      d += `${cmd}${x(pt.i).toFixed(2)},${y(pt.value).toFixed(2)} `;
+    });
+    lineG.appendChild(el('path', { class:'icg-line', d }));
+    const lastPt = visible[visible.length-1];
+    lineG.appendChild(el('circle', { class:'end-dot', cx: x(lastPt.i).toFixed(2), cy: y(lastPt.value).toFixed(2), r: 4 }));
+    const anchorRight = x(lastPt.i) > M.left + plotW * 0.85;
+    const endLabel = el('text', {
+      x: (x(lastPt.i) + (anchorRight ? -6 : 6)).toFixed(2), y: (y(lastPt.value)-10).toFixed(2),
+      'text-anchor': anchorRight ? 'end' : 'start',
+      style: 'font-size:11.5px; font-weight:700; fill:var(--text-primary)'
+    });
+    endLabel.textContent = lastPt.value.toFixed(2);
+    lineG.appendChild(endLabel);
+
+    // ribbon
+    clear(ribbon);
+    periodsInView(i0, i1).forEach(p=>{
+      const bx0 = Math.max(p.i0, i0), bx1 = Math.min(p.i1 + 1, i1);
+      const leftPct = (x(bx0)-M.left)/plotW*100;
+      const widthPct = (x(bx1)-x(bx0))/plotW*100;
+      const seg = document.createElement('div');
+      seg.className = 'seg' + (widthPct < 6 ? ' narrow' : '');
+      seg.style.left = leftPct + '%';
+      seg.style.width = Math.max(widthPct,0) + '%';
+      seg.dataset.slot = p.slot;
+      seg.title = `${p.name} · prom. ${p.avg.toFixed(2)}`;
+      seg.innerHTML = `<span class="dot" style="background:${slotColor(p.slot)}"></span>${p.short}`;
+      ribbon.appendChild(seg);
+    });
+
+    // sync selector buttons
+    govButtons.querySelectorAll('button').forEach(btn=>{
+      const isAll = btn.dataset.all === '1';
+      const active = isAll ? (i0 === FULL.i0 && i1 === FULL.i1) : (Number(btn.dataset.i0) === i0 && Number(btn.dataset.i1) === i1);
+      btn.classList.toggle('active', active);
+    });
+
+    hideTooltip();
+  }
+
+  function highlightBand(slot){
+    bandsG.querySelectorAll('rect').forEach(r=>{
+      r.setAttribute('fill-opacity', Number(r.dataset.slot) === slot ? 0.30 : 0.13);
+    });
+  }
+
+  function showTooltip(clientX, clientY, pt){
+    const p = periodAt(pt.i);
+    const rectBox = card.getBoundingClientRect();
+    const dot = `<span class="dot" style="background:${slotColor(p.slot)}"></span>`;
+    tooltip.innerHTML =
+      `<div class="tt-date">${monthLabel(pt.date)}</div>` +
+      `<div class="tt-val">${pt.value.toFixed(3)}</div>` +
+      `<div class="tt-gov">${dot}${p.name}</div>`;
+    let left = clientX - rectBox.left + 14;
+    let top = clientY - rectBox.top - 46;
+    if (left > rectBox.width - 160) left = clientX - rectBox.left - 170;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = Math.max(top, 4) + 'px';
+    tooltip.style.opacity = 1;
+  }
+  function hideTooltip(){ tooltip.style.opacity = 0; crosshair.style.opacity = 0; hoverDot.style.opacity = 0; }
+
+  function nearestPoint(clientX){
+    const box = svg.getBoundingClientRect();
+    const svgX = ((clientX - box.left) / box.width) * W;
+    const rel = Math.min(Math.max((svgX - M.left) / plotW, 0), 1);
+    const iApprox = view.i0 + rel * (view.i1 - view.i0);
+    let best = SERIES[0], bestD = Infinity;
+    for (const s of SERIES){
+      if (s.i < view.i0 - 1 || s.i > view.i1 + 1) continue;
+      const dd = Math.abs(s.i - iApprox);
+      if (dd < bestD){ bestD = dd; best = s; }
+    }
+    return best;
+  }
+
+  // ---------- hover ----------
+  hitRect.addEventListener('pointermove', (e)=>{
+    const pt = nearestPoint(e.clientX);
+    const px = xNow(pt.i), py = yNow(pt.value);
+    crosshair.setAttribute('x1', px); crosshair.setAttribute('x2', px);
+    crosshair.style.opacity = 1;
+    hoverDot.setAttribute('cx', px); hoverDot.setAttribute('cy', py);
+    hoverDot.style.opacity = 1;
+    showTooltip(e.clientX, e.clientY, pt);
+    highlightBand(periodAt(pt.i).slot);
+  });
+  hitRect.addEventListener('pointerleave', ()=>{ hideTooltip(); highlightBand(-1); });
+
+  // ---------- government selector buttons ----------
+  function addGovButton(label, i0, i1, dot, isAll){
+    const btn = document.createElement('button');
+    if (isAll) btn.dataset.all = '1';
+    else { btn.dataset.i0 = i0; btn.dataset.i1 = i1; }
+    btn.innerHTML = (dot ? `<span class="dot" style="background:${dot}"></span>` : '') + label;
+    btn.addEventListener('click', ()=> draw(i0, i1));
+    govButtons.appendChild(btn);
+  }
+  addGovButton('Todos', FULL.i0, FULL.i1, null, true);
+  PERIODS.forEach(p=> addGovButton(p.short, p.i0, p.i1, slotColor(p.slot), false));
+
+  // ---------- data table (static, always full period) ----------
+  const table = document.getElementById('dataTable');
+  const rows = PERIODS.map(p =>
+    `<tr><td><span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:${slotColor(p.slot)};margin-right:6px;"></span>${p.name}</td>` +
+    `<td>${monthLabel(p.start)} – ${p.i1===N ? 'actualidad' : monthLabel(p.end)}</td>` +
+    `<td class="num">${p.avg.toFixed(3)}</td><td class="num">${p.min.toFixed(3)}</td><td class="num">${p.max.toFixed(3)}</td><td class="num">${p.n}</td></tr>`
+  ).join('');
+  table.innerHTML =
+    `<thead><tr><th>Gobierno</th><th>Período</th><th class="num">Promedio</th><th class="num">Mínimo</th><th class="num">Máximo</th><th class="num">Meses</th></tr></thead>` +
+    `<tbody>${rows}</tbody>`;
+
+  draw(FULL.i0, FULL.i1);
+})();
+</script>
+</body>
+</html>
