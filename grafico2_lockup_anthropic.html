@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anthropic: calendario de liberación de acciones tras la IPO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,700;8..60,800&display=swap" rel="stylesheet">
+<style>
+  .viz-root {
+    color-scheme: light;
+    --page: #f3f1ec; --card: #ffffff;
+    --text-primary: #0f1115; --text-secondary: #4d5058; --text-muted: #80838b;
+    --rule: #e7e4dd; --track: #f2f0eb;
+    --line: #2a63b8; --line-b: #4f8ee0; --area-top: rgba(58,123,213,.30); --area-bot: rgba(58,123,213,.02);
+    --bar-a: #3d6aa8; --bar-b: #5d8ac9;
+    --hl-a: #d4511c; --hl-b: #f07a45; --hl-soft: #fdebe2;
+    --ph1: #e3ecf8; --ph2: #d2e0f4;
+    --shadow: 0 1px 2px rgba(15,17,21,.04), 0 8px 28px rgba(15,17,21,.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --page: #121212; --card: #1b1c1f; --text-primary: #f2f1ee; --text-secondary: #c2c1bb; --text-muted: #8f8e88;
+      --rule: #2c2d31; --track: #232428; --line: #5a92e0; --line-b: #84b2f0; --area-top: rgba(90,146,224,.32); --area-bot: rgba(90,146,224,.02);
+      --bar-a: #4f7fc0; --bar-b: #73a0dc; --hl-a: #e0662f; --hl-b: #ff9160; --hl-soft: #3a2219;
+      --ph1: #20283a; --ph2: #273350; --shadow: 0 8px 28px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --page: #121212; --card: #1b1c1f; --text-primary: #f2f1ee; --text-secondary: #c2c1bb; --text-muted: #8f8e88;
+    --rule: #2c2d31; --track: #232428; --line: #5a92e0; --line-b: #84b2f0; --area-top: rgba(90,146,224,.32); --area-bot: rgba(90,146,224,.02);
+    --bar-a: #4f7fc0; --bar-b: #73a0dc; --hl-a: #e0662f; --hl-b: #ff9160; --hl-soft: #3a2219;
+    --ph1: #20283a; --ph2: #273350; --shadow: 0 8px 28px rgba(0,0,0,.4);
+  }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--page, #f3f1ec); }
+  .viz-root {
+    background: var(--page); color: var(--text-primary);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    padding: 16px; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+  }
+  .card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); max-width: 900px; margin: 0 auto; padding: 26px 26px 20px; box-sizing: border-box; position: relative; overflow: hidden; }
+  .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: linear-gradient(90deg, var(--line), var(--hl-b)); }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--hl-a); margin-bottom: 10px; }
+  .kicker .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hl-a); box-shadow: 0 0 0 4px var(--hl-soft); }
+  h1 { font-family: "Source Serif 4", Georgia, serif; font-size: 28px; line-height: 1.15; margin: 0 0 8px; font-weight: 800; letter-spacing: -.01em; }
+  h1 em { font-style: normal; color: var(--hl-a); }
+  .sub { font-size: 15px; color: var(--text-secondary); margin: 0 0 18px; line-height: 1.45; max-width: 680px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .kpi { background: var(--track); border-radius: 12px; padding: 12px 14px; }
+  .kpi .k { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+  .kpi .v { font-size: 26px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .kpi .v small { font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-left: 3px; }
+  .kpi.acc { background: var(--hl-soft); }
+  .kpi.acc .v { color: var(--hl-a); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .left { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seg { display: inline-flex; background: var(--track); border-radius: 999px; padding: 3px; }
+  .seg button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border: 0; border-radius: 999px; background: transparent; color: var(--text-secondary); cursor: pointer; transition: background .2s, color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--card); color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .seg button:disabled { opacity: .4; cursor: default; }
+  .play { font: inherit; font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; border: 0; cursor: pointer; background: var(--hl-a); color: #fff; }
+  .play:hover { filter: brightness(1.07); }
+  .play svg { width: 10px; height: 10px; }
+
+  .readout { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: end; border-left: 4px solid var(--hl-a); padding: 6px 0 6px 14px; margin-bottom: 12px; min-height: 64px; }
+  .readout .t { font-size: 12px; font-weight: 700; color: var(--hl-a); text-transform: uppercase; letter-spacing: .06em; }
+  .readout .d { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+  .readout .nums { text-align: right; }
+  .readout .cum { font-size: 26px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+  .readout .cum small { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+  .readout .add { font-size: 13px; font-weight: 700; color: var(--hl-a); font-variant-numeric: tabular-nums; }
+  .prog { grid-column: 1 / -1; height: 6px; background: var(--track); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+  .prog i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--line), var(--hl-b)); border-radius: 99px; transition: width .35s cubic-bezier(.2,.8,.2,1); }
+
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .axis { font-size: 11px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .axis.on { fill: var(--text-primary); font-weight: 800; }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .phlbl { font-size: 10.5px; font-weight: 700; fill: var(--text-secondary); letter-spacing: .03em; }
+  .ann { font-size: 12.5px; font-weight: 800; fill: var(--hl-a); font-variant-numeric: tabular-nums; }
+  .ann2 { font-size: 10.5px; font-weight: 600; fill: var(--text-secondary); }
+  .hit { fill: transparent; cursor: pointer; }
+  .hover-col { fill: var(--line); opacity: 0; transition: opacity .15s; }
+  .hover-col.on { opacity: .08; }
+  .cursor-dot { fill: var(--card); stroke: var(--hl-a); stroke-width: 2.5; opacity: 0; transition: opacity .15s; }
+  .cursor-dot.on { opacity: 1; }
+  .stepline { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); }
+  .go .stepline { transition: stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1); stroke-dashoffset: 0; }
+  .areaf { opacity: 0; } .go .areaf { transition: opacity .8s ease .9s; opacity: 1; }
+  .bigs { opacity: 0; } .go .bigs { transition: opacity .5s ease 1.6s; opacity: 1; }
+  .barm { transform-box: fill-box; transform-origin: center bottom; transform: scaleY(0); transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+  .go .barm { transform: scaleY(1); }
+
+  .foot { font-size: 11.5px; color: var(--text-muted); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); line-height: 1.55; }
+  .foot .src { display: block; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--rule); }
+  th { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; position: sticky; top: 0; background: var(--card); }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.big td { font-weight: 800; color: var(--hl-a); background: var(--hl-soft); }
+  .tscroll { max-height: 440px; overflow: auto; }
+  [hidden] { display: none !important; }
+  @media (max-width: 560px) {
+    .viz-root { padding: 8px; }
+    .card { padding: 22px 16px 16px; border-radius: 12px; }
+    h1 { font-size: 23px; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpis .kpi:first-child { grid-column: 1 / -1; }
+    .kpi .v { font-size: 22px; }
+    .readout { grid-template-columns: 1fr; }
+    .readout .nums { text-align: left; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .readout .cum { font-size: 22px; order: -1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .stepline, .areaf, .bigs, .barm, .prog i { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="card" id="root">
+  <div class="kicker"><i class="dot"></i>Mercados · Salida a bolsa</div>
+  <h1>La escalera de Anthropic: <em>15.483 millones</em> de acciones saldrán al mercado en 23 tramos</h1>
+  <p class="sub">Cómo se irán liberando las acciones bloqueadas (lock-up) tras el debut bursátil, según el prospecto final. Clases A y N combinadas.</p>
+
+  <div class="controls">
+    <div class="left">
+      <div class="seg" role="group" aria-label="Métrica">
+        <button type="button" data-mode="cum" aria-pressed="true">Acumulado</button>
+        <button type="button" data-mode="step" aria-pressed="false">Por tramo</button>
+      </div>
+    </div>
+    <div class="seg" role="group" aria-label="Vista">
+      <button type="button" data-view="chart" aria-pressed="true">Gráfico</button>
+      <button type="button" data-view="table" aria-pressed="false">Tabla</button>
+    </div>
+  </div>
+
+  <div id="chartWrap">
+    <div class="readout" id="readout" aria-live="polite"></div>
+    <svg id="chart" role="img" aria-label="Gráfico escalonado: las acciones de Anthropic habilitadas para la venta pasan de 315 millones el primer día a 15.483 millones tras el tramo 23"></svg>
+  </div>
+  <div id="tableWrap" class="tscroll" hidden></div>
+
+  <div class="foot">
+    <span class="src">Fuente: prospecto final Form 424B4 de Anthropic (18/11/2026)</span>
+  </div>
+</div>
+</div>
+
+<script>
+(function () {
+  var data = [
+    [1, "19/11/2026", "Primer día de cotización (IPO)", 315],
+    [2, "15/12/2026", "Prospecto + 27 días", 303],
+    [3, "05/01/2027", "Prospecto + 48 días", 303],
+    [4, "19/01/2027", "Prospecto + 62 días", 353],
+    [5, "02/02/2027", "Prospecto + 76 días", 353],
+    [6, "A definir", "Resultados FY26 + 2 ruedas", 1700],
+    [7, "A definir", "Resultados FY26 + 13 días", 480],
+    [8, "A definir", "Resultados FY26 + 27 días", 480],
+    [9, "A definir", "Resultados FY26 + 41 días", 480],
+    [10, "A definir", "Resultados FY26 + 55 días", 480],
+    [11, "A definir", "Resultados FY26 + 69 días", 480],
+    [12, "A definir", "Resultados 1T27 + 2 ruedas / 180 días", 3000],
+    [13, "A definir", "Resultados 1T27 + 34 días", 447],
+    [14, "A definir", "Resultados 1T27 + 48 días", 447],
+    [15, "A definir", "Resultados 1T27 + 62 días", 447],
+    [16, "A definir", "Resultados 1T27 + 76 días", 447],
+    [17, "A definir", "Resultados 2T27 + 2 ruedas", 558],
+    [18, "A definir", "Resultados 2T27 + 27 días", 502],
+    [19, "A definir", "Resultados 2T27 + 41 días", 502],
+    [20, "A definir", "Resultados 2T27 + 55 días", 502],
+    [21, "A definir", "Resultados 2T27 + 69 días", 502],
+    [22, "A definir", "Resultados 2T27 + 83 días", 502],
+    [23, "A definir", "Resultados 3T27 + 2 ruedas / 365 días", 1900]
+  ].map(function (r) { return { n: r[0], date: r[1], trig: r[2], add: r[3] }; });
+  var run = 0;
+  data.forEach(function (d) { run += d.add; d.cum = run; });
+  var TOTAL = run;
+
+  var phases = [
+    { from: 1, to: 5, label: "Prospecto", short: "Prosp." },
+    { from: 6, to: 11, label: "Resultados FY26", short: "FY26" },
+    { from: 12, to: 16, label: "Resultados 1T27", short: "1T27" },
+    { from: 17, to: 22, label: "Resultados 2T27", short: "2T27" },
+    { from: 23, to: 23, label: "3T27", short: "3T" }
+  ];
+  var big = { 6: "Resultados FY26", 12: "180 días", 23: "365 días" };
+
+  var nf = function (x) { return x.toLocaleString("es-AR"); };
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("chart"), readout = document.getElementById("readout");
+  var mode = "cum", animated = false, current = 22, geo = null;
+
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  function draw() {
+    var W = Math.max(280, svg.parentNode.clientWidth);
+    var narrow = W < 560;
+    var H = narrow ? 300 : 360;
+    var m = { l: narrow ? 40 : 52, r: 10, t: 12, b: 50 };
+    var pw = W - m.l - m.r, ph = H - m.t - m.b;
+    var N = data.length, cw = pw / N;
+    var yMax = mode === "cum" ? 17500 : 3500;
+    var ticks = mode === "cum" ? [0, 4000, 8000, 12000, 16000] : [0, 1000, 2000, 3000];
+    var X = function (i) { return m.l + i * cw; };
+    var Y = function (v) { return m.t + ph - (v / yMax) * ph; };
+    geo = { X: X, Y: Y, cw: cw, m: m, ph: ph };
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.innerHTML = "";
+
+    var defs = el("defs", {}, svg);
+    var ga = el("linearGradient", { id: "gArea", x1: 0, x2: 0, y1: 0, y2: 1 }, defs);
+    el("stop", { offset: "0", style: "stop-color:var(--area-top)" }, ga);
+    el("stop", { offset: "1", style: "stop-color:var(--area-bot)" }, ga);
+    var gl = el("linearGradient", { id: "gLine", x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
+    el("stop", { offset: "0", style: "stop-color:var(--line)" }, gl);
+    el("stop", { offset: "1", style: "stop-color:var(--line-b)" }, gl);
+    var gb = el("linearGradient", { id: "gBar", x1: 0, x2: 0, y1: 1, y2: 0 }, defs);
+    el("stop", { offset: "0", style: "stop-color:var(--bar-a)" }, gb);
+    el("stop", { offset: "1", style: "stop-color:var(--bar-b)" }, gb);
+    var gh = el("linearGradient", { id: "gHl", x1: 0, x2: 0, y1: 1, y2: 0 }, defs);
+    el("stop", { offset: "0", style: "stop-color:var(--hl-a)" }, gh);
+    el("stop", { offset: "1", style: "stop-color:var(--hl-b)" }, gh);
+
+    ticks.forEach(function (t) {
+      el("line", { x1: m.l, x2: W - m.r, y1: Y(t), y2: Y(t), class: "grid", "stroke-dasharray": t ? "3 4" : "" }, svg);
+      var tx = el("text", { x: m.l - 8, y: Y(t) + 4, class: "axis", "text-anchor": "end" }, svg);
+      tx.textContent = t === 0 ? "0" : nf(t);
+    });
+    var unit = el("text", { x: m.l - 8, y: m.t - 0, class: "axis", "text-anchor": "end" }, svg);
+    unit.textContent = "";
+
+    var hov = el("rect", { x: 0, y: m.t, width: cw, height: ph, rx: 4, class: "hover-col" }, svg);
+
+    var chartG = el("g", { id: "plot" }, svg);
+    if (mode === "cum") {
+      var line = "M" + X(0) + "," + Y(0);
+      data.forEach(function (d, i) { line += " V" + Y(d.cum) + " H" + X(i + 1); });
+      el("path", { d: line + " V" + Y(0) + " Z", fill: "url(#gArea)", class: "areaf" }, chartG);
+      var lp = el("path", { d: line, fill: "none", stroke: "url(#gLine)", "stroke-width": 2.5, "stroke-linejoin": "round", class: "stepline" }, chartG);
+      var len = lp.getTotalLength ? lp.getTotalLength() : 4000;
+      lp.style.setProperty("--len", len);
+    } else {
+      var gap = Math.max(2, cw * 0.18);
+      data.forEach(function (d, i) {
+        var bx = X(i) + gap / 2, bw = cw - gap, y = Y(d.add), h = Y(0) - y, r = Math.min(4, bw / 2, h);
+        var p = "M" + bx + "," + Y(0) + " V" + (y + r) + " q0,-" + r + " " + r + ",-" + r +
+                " H" + (bx + bw - r) + " q" + r + ",0 " + r + "," + r + " V" + Y(0) + " Z";
+        var b = el("path", { d: p, fill: big[d.n] ? "url(#gHl)" : "url(#gBar)", class: "barm" }, chartG);
+        b.style.transitionDelay = (i * 35) + "ms";
+      });
+    }
+
+    // big-tranche annotations
+    var bg = el("g", { class: "bigs" }, svg);
+    data.forEach(function (d, i) {
+      if (!big[d.n]) return;
+      var v = mode === "cum" ? d.cum : d.add;
+      var cx = mode === "cum" ? X(i) : X(i) + cw / 2;
+      var cy = Y(v);
+      if (mode === "cum") el("circle", { cx: cx, cy: cy, r: 4.5, fill: "var(--hl-a)", stroke: "var(--card)", "stroke-width": 2 }, bg);
+      var anchor = d.n === 23 ? "end" : (mode === "cum" ? "end" : "middle");
+      var tx = d.n === 23 ? X(i + 1) - 2 : (mode === "cum" ? cx - 8 : cx);
+      var ty = mode === "cum" ? cy - (narrow ? 8 : 18) : cy - (narrow ? 8 : 20);
+      if (d.n === 23 && mode === "cum") { tx = cx - 8; }
+      var a = el("text", { x: tx, y: ty, class: "ann", "text-anchor": anchor }, bg);
+      a.textContent = "+" + nf(d.add) + " M";
+      if (!narrow) {
+        var a2 = el("text", { x: tx, y: ty + 13, class: "ann2", "text-anchor": anchor }, bg);
+        a2.textContent = big[d.n];
+      }
+    });
+
+    // x ticks
+    data.forEach(function (d, i) {
+      if (narrow && d.n % 2 === 0) return;
+      var tx = el("text", { x: X(i) + cw / 2, y: Y(0) + 16, class: "axis", "text-anchor": "middle", "data-n": d.n }, svg);
+      tx.textContent = d.n;
+    });
+    var xl = el("text", { x: m.l, y: Y(0) + 16, class: "axis", "text-anchor": "end", dx: -8 }, svg);
+    xl.textContent = narrow ? "" : "Tramo";
+
+    // phase strip
+    phases.forEach(function (p, k) {
+      var x0 = X(p.from - 1) + 1, x1 = X(p.to) - 1, y = Y(0) + 24;
+      el("rect", { x: x0, y: y, width: x1 - x0, height: 18, rx: 5, fill: k % 2 ? "var(--ph2)" : "var(--ph1)" }, svg);
+      var lbl = (x1 - x0) > 92 ? p.label : p.short;
+      if ((x1 - x0) < 22) lbl = "";
+      var t = el("text", { x: (x0 + x1) / 2, y: y + 12.5, class: "phlbl", "text-anchor": "middle" }, svg);
+      t.textContent = lbl;
+    });
+
+    var dot = el("circle", { r: 6, class: "cursor-dot" }, svg);
+
+    data.forEach(function (d, i) {
+      var hit = el("rect", { x: X(i), y: m.t, width: cw, height: ph + m.b, class: "hit" }, svg);
+      var on = function () { select(i); };
+      hit.addEventListener("mouseenter", on);
+      hit.addEventListener("touchstart", on, { passive: true });
+      hit.addEventListener("click", on);
+    });
+    svg._hov = hov; svg._dot = dot;
+    select(current, true);
+    if (animated) svg.classList.add("go");
+  }
+
+  function select(i, quiet) {
+    current = i;
+    var d = data[i];
+    if (geo && svg._hov) {
+      svg._hov.setAttribute("x", geo.X(i));
+      svg._hov.classList.toggle("on", !quiet);
+      var v = mode === "cum" ? d.cum : d.add;
+      svg._dot.setAttribute("cx", mode === "cum" ? geo.X(i) + geo.cw / 2 : geo.X(i) + geo.cw / 2);
+      svg._dot.setAttribute("cy", geo.Y(v));
+      svg._dot.classList.toggle("on", !quiet);
+      svg.querySelectorAll("text[data-n]").forEach(function (t) { t.classList.toggle("on", !quiet && +t.getAttribute("data-n") === d.n); });
+    }
+    var pct = d.cum / TOTAL * 100;
+    readout.innerHTML =
+      "<div><div class='t'>Tramo " + d.n + " de 23 · " + d.date + "</div><div class='d'>" + d.trig + "</div></div>" +
+      "<div class='nums'><div class='add'>+" + nf(d.add) + " M nuevas</div><div class='cum'>" + nf(d.cum) + " M <small>acumuladas</small></div></div>" +
+      "<div class='prog' title='" + pct.toLocaleString("es-AR", { maximumFractionDigits: 1 }) + "% del total'><i style='width:" + pct + "%'></i></div>";
+  }
+
+  function table() {
+    var h = "<table><thead><tr><th>#</th><th>Fecha</th><th>Disparador</th><th class='n'>+ Acciones (M)</th><th class='n'>Acumulado (M)</th></tr></thead><tbody>";
+    data.forEach(function (d) {
+      h += "<tr" + (big[d.n] ? " class='big'" : "") + "><td>" + d.n + "</td><td>" + d.date + "</td><td>" + d.trig +
+           "</td><td class='n'>" + nf(d.add) + "</td><td class='n'>" + nf(d.cum) + "</td></tr>";
+    });
+    document.getElementById("tableWrap").innerHTML = h + "</tbody></table>";
+  }
+
+  document.querySelectorAll("[data-mode]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      mode = b.getAttribute("data-mode");
+      document.querySelectorAll("[data-mode]").forEach(function (o) { o.setAttribute("aria-pressed", o === b); });
+      svg.classList.remove("go"); draw();
+      requestAnimationFrame(function () { requestAnimationFrame(function () { svg.classList.add("go"); }); });
+    });
+  });
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var v = b.getAttribute("data-view");
+      document.querySelectorAll("[data-view]").forEach(function (o) { o.setAttribute("aria-pressed", o === b); });
+      document.getElementById("chartWrap").hidden = v !== "chart";
+      document.getElementById("tableWrap").hidden = v !== "table";
+      document.querySelectorAll("[data-mode]").forEach(function (o) { o.disabled = v !== "chart"; });
+    });
+  });
+
+  table(); draw();
+  function start() { if (animated) return; animated = true; requestAnimationFrame(function () { requestAnimationFrame(function () { svg.classList.add("go"); }); }); }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { start(); io.disconnect(); } }, { threshold: .25 });
+    io.observe(svg);
+  } else start();
+  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(draw, 100); });
+})();
+</script>
+</body>
+</html>

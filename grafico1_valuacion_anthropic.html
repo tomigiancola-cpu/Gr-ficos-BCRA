@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anthropic, entre las acciones más valiosas de EE.UU.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,700;8..60,800&display=swap" rel="stylesheet">
+<style>
+  .viz-root {
+    color-scheme: light;
+    --page: #f3f1ec;
+    --card: #ffffff;
+    --text-primary: #0f1115;
+    --text-secondary: #4d5058;
+    --text-muted: #80838b;
+    --rule: #e7e4dd;
+    --track: #f2f0eb;
+    --base-a: #3d6aa8;
+    --base-b: #5d8ac9;
+    --hl-a: #d4511c;
+    --hl-b: #f07a45;
+    --hl-soft: #fdebe2;
+    --tip-bg: #0f1115;
+    --tip-text: #ffffff;
+    --shadow: 0 1px 2px rgba(15,17,21,.04), 0 8px 28px rgba(15,17,21,.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --page: #121212; --card: #1b1c1f; --text-primary: #f2f1ee; --text-secondary: #c2c1bb; --text-muted: #8f8e88;
+      --rule: #2c2d31; --track: #232428; --base-a: #4f7fc0; --base-b: #73a0dc; --hl-a: #e0662f; --hl-b: #ff9160;
+      --hl-soft: #3a2219; --tip-bg: #f2f1ee; --tip-text: #0f1115; --shadow: 0 8px 28px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --page: #121212; --card: #1b1c1f; --text-primary: #f2f1ee; --text-secondary: #c2c1bb; --text-muted: #8f8e88;
+    --rule: #2c2d31; --track: #232428; --base-a: #4f7fc0; --base-b: #73a0dc; --hl-a: #e0662f; --hl-b: #ff9160;
+    --hl-soft: #3a2219; --tip-bg: #f2f1ee; --tip-text: #0f1115; --shadow: 0 8px 28px rgba(0,0,0,.4);
+  }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--page, #f3f1ec); }
+  .viz-root {
+    background: var(--page); color: var(--text-primary);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    padding: 16px; box-sizing: border-box; -webkit-font-smoothing: antialiased;
+  }
+  .card {
+    background: var(--card); border-radius: 16px; box-shadow: var(--shadow);
+    max-width: 760px; margin: 0 auto; padding: 26px 26px 20px; box-sizing: border-box; position: relative; overflow: hidden;
+  }
+  .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: linear-gradient(90deg, var(--base-a), var(--hl-b)); }
+  .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--hl-a); margin-bottom: 10px; }
+  .kicker .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hl-a); box-shadow: 0 0 0 4px var(--hl-soft); }
+  h1 { font-family: "Source Serif 4", Georgia, serif; font-size: 28px; line-height: 1.15; margin: 0 0 8px; font-weight: 800; letter-spacing: -.01em; }
+  h1 em { font-style: normal; color: var(--hl-a); }
+  .sub { font-size: 15px; color: var(--text-secondary); margin: 0 0 18px; line-height: 1.45; max-width: 600px; }
+
+  .hero { display: grid; grid-template-columns: auto 1fr; gap: 14px 22px; align-items: center; background: var(--hl-soft); border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; }
+  .hero .big { font-size: 40px; font-weight: 800; letter-spacing: -.02em; color: var(--hl-a); font-variant-numeric: tabular-nums; line-height: 1; }
+  .hero .big small { font-size: 16px; font-weight: 700; margin-left: 4px; }
+  .hero .txt { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
+  .hero .txt b { font-weight: 700; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .legend { display: flex; gap: 16px; font-size: 12.5px; color: var(--text-secondary); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 14px; height: 10px; border-radius: 3px; display: inline-block; }
+  .seg { display: inline-flex; background: var(--track); border-radius: 999px; padding: 3px; }
+  .seg button { font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 14px; border: 0; border-radius: 999px; background: transparent; color: var(--text-secondary); cursor: pointer; transition: background .2s, color .2s; }
+  .seg button[aria-pressed="true"] { background: var(--card); color: var(--text-primary); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .rank { font-size: 11px; fill: var(--text-muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .lbl { font-size: 14px; fill: var(--text-primary); font-weight: 500; }
+  .lbl.hl { font-weight: 800; fill: var(--hl-a); }
+  .val { font-size: 13px; fill: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .val.hl { fill: var(--hl-a); font-weight: 800; font-size: 14px; }
+  .axis { font-size: 11px; fill: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .track { fill: var(--track); }
+  .row { transition: opacity .2s; }
+  .row.dim { opacity: .32; }
+  .hit { fill: transparent; cursor: pointer; }
+  .callout { font-size: 12px; fill: var(--text-secondary); }
+  .callout b { font-weight: 700; }
+  .bar { transform-box: fill-box; transform-origin: left center; transform: scaleX(0); transition: transform 1s cubic-bezier(.2,.8,.2,1); }
+  .go .bar { transform: scaleX(1); }
+  .val, .callout-g { opacity: 0; transition: opacity .5s ease .8s; }
+  .go .val, .go .callout-g { opacity: 1; }
+
+  .tip {
+    position: absolute; pointer-events: none; background: var(--tip-bg); color: var(--tip-text);
+    border-radius: 10px; padding: 10px 12px; font-size: 13px; line-height: 1.45; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; min-width: 180px; z-index: 5;
+  }
+  .tip.on { opacity: 1; transform: none; }
+  .tip b { display: block; font-size: 14px; margin-bottom: 2px; }
+  .tip .m { opacity: .7; font-size: 12px; }
+  .tip .v { font-size: 18px; font-weight: 800; display: block; margin: 2px 0; font-variant-numeric: tabular-nums; }
+
+  .foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: var(--text-muted); margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); line-height: 1.5; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--rule); }
+  th { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hl td { font-weight: 800; color: var(--hl-a); background: var(--hl-soft); }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) {
+    .card { padding: 22px 16px 16px; border-radius: 12px; }
+    .viz-root { padding: 8px; }
+    h1 { font-size: 23px; }
+    .hero { grid-template-columns: 1fr; gap: 6px; }
+    .hero .big { font-size: 34px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bar, .val, .callout-g { transition: none; } }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="card" id="root">
+  <div class="kicker"><i class="dot"></i>Mercados · Salida a bolsa</div>
+  <h1>Anthropic llega a Wall Street y se mete en el <em>top 10</em> de las empresas más valiosas de EE.UU.</h1>
+  <p class="sub">Capitalización de mercado de las mayores compañías estadounidenses frente a la valuación potencial totalmente diluida de Anthropic.</p>
+
+  <div class="hero">
+    <div class="big">US$1,4<small>billones</small></div>
+    <div class="txt">Valuación potencial de Anthropic: <b>a solo US$0,1 billones de Tesla</b> y equivalente a <b>más de un cuarto del valor de Apple</b>.</div>
+  </div>
+
+  <div class="controls">
+    <div class="legend">
+      <span><i class="sw" style="background:linear-gradient(90deg,var(--base-a),var(--base-b))"></i>Capitalización de mercado</span>
+      <span><i class="sw" style="background:linear-gradient(90deg,var(--hl-a),var(--hl-b))"></i>Valuación potencial diluida</span>
+    </div>
+    <div class="seg" role="group" aria-label="Vista">
+      <button type="button" data-view="chart" aria-pressed="true">Gráfico</button>
+      <button type="button" data-view="table" aria-pressed="false">Tabla</button>
+    </div>
+  </div>
+
+  <div id="chartWrap"><svg id="chart" role="img" aria-label="Ranking de valuación: Apple 5,2; Nvidia 3,9; Microsoft 3,9; Alphabet 3,6; Amazon 2,9; SpaceX 1,9; Meta 1,7; Broadcom 1,7; Tesla 1,5; Anthropic 1,4 billones de dólares"></svg></div>
+  <div id="tableWrap" hidden></div>
+  <div class="tip" id="tip"></div>
+
+</div>
+</div>
+
+<script>
+(function () {
+  var data = [
+    { name: "Apple", v: 5.2 }, { name: "Nvidia", v: 3.9 }, { name: "Microsoft", v: 3.9 },
+    { name: "Alphabet", v: 3.6 }, { name: "Amazon", v: 2.9 }, { name: "SpaceX", v: 1.9 },
+    { name: "Meta", v: 1.7 }, { name: "Broadcom", v: 1.7 }, { name: "Tesla", v: 1.5 },
+    { name: "Anthropic", v: 1.4, hl: true }
+  ];
+  var anth = 1.4;
+  var n1 = function (x) { return x.toLocaleString("es-AR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("chart"), tip = document.getElementById("tip"), root = document.getElementById("root");
+  var animated = false;
+
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  function draw() {
+    var W = Math.max(280, svg.parentNode.clientWidth);
+    var narrow = W < 480;
+    var rankW = narrow ? 20 : 24, labelW = narrow ? 80 : 104, valW = narrow ? 58 : 80;
+    var rowH = narrow ? 34 : 38, barH = narrow ? 20 : 22, top = 22, bottom = 6;
+    var H = top + data.length * rowH + bottom;
+    var x0 = rankW + labelW, plotW = W - x0 - valW, max = 6;
+    var x = function (v) { return x0 + (v / max) * plotW; };
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.innerHTML = "";
+
+    var defs = el("defs", {}, svg);
+    [["gBase", "var(--base-a)", "var(--base-b)"], ["gHl", "var(--hl-a)", "var(--hl-b)"]].forEach(function (g) {
+      var lg = el("linearGradient", { id: g[0], x1: 0, x2: 1, y1: 0, y2: 0 }, defs);
+      el("stop", { offset: "0", style: "stop-color:" + g[1] }, lg);
+      el("stop", { offset: "1", style: "stop-color:" + g[2] }, lg);
+    });
+
+    for (var t = 0; t <= max; t++) {
+      var gx = x(t);
+      el("line", { x1: gx, x2: gx, y1: top - 6, y2: top + data.length * rowH, class: "grid" }, svg);
+      var tt = el("text", { x: gx, y: 11, class: "axis", "text-anchor": "middle" }, svg);
+      tt.textContent = t === 0 ? "0" : (narrow ? t : "US$" + t);
+    }
+
+    var g0 = el("g", { id: "bars" }, svg);
+    data.forEach(function (d, i) {
+      var yRow = top + i * rowH, y = yRow + (rowH - barH) / 2;
+      var g = el("g", { class: "row" }, g0);
+      var rk = el("text", { x: 0, y: y + barH / 2 + 4, class: "rank" }, g);
+      rk.textContent = String(i + 1).padStart(2, "0");
+      var lab = el("text", { x: x0 - 10, y: y + barH / 2 + 5, class: "lbl" + (d.hl ? " hl" : ""), "text-anchor": "end" }, g);
+      lab.textContent = d.name;
+      el("rect", { x: x0, y: y, width: plotW, height: barH, rx: 4, class: "track" }, g);
+      var w = x(d.v) - x0, r = 5;
+      var path = "M" + x0 + "," + y + " H" + (x0 + w - r) + " q" + r + ",0 " + r + "," + r +
+                 " V" + (y + barH - r) + " q0," + r + " -" + r + "," + r + " H" + x0 + " Z";
+      var bar = el("path", { d: path, class: "bar", fill: d.hl ? "url(#gHl)" : "url(#gBase)" }, g);
+      bar.style.transitionDelay = (i * 60) + "ms";
+      var val = el("text", { x: x0 + w + 8, y: y + barH / 2 + 4.5, class: "val" + (d.hl ? " hl" : "") }, g);
+      val.textContent = "US$" + n1(d.v);
+      if (x0 + w + 8 + 52 > W) { val.setAttribute("x", x0 + w - 8); val.setAttribute("text-anchor", "end"); val.style.fill = "#fff"; }
+      var hit = el("rect", { x: 0, y: yRow, width: W, height: rowH, class: "hit" }, g);
+      hit.addEventListener("mousemove", function (ev) { show(ev, d, i); });
+      hit.addEventListener("mouseleave", hide);
+      hit.addEventListener("touchstart", function (ev) { show(ev.touches[0], d, i); }, { passive: true });
+    });
+
+    // callout next to the Anthropic value (desktop only; mobile has the hero box)
+    if (!narrow) {
+      var yA = top + 9 * rowH + rowH / 2 + 4.5;
+      var cg = el("g", { class: "callout-g" }, svg);
+      var cx = x(1.4) + 70;
+      el("line", { x1: cx, x2: cx + 14, y1: yA - 4, y2: yA - 4, stroke: "var(--hl-a)", "stroke-width": 1.2, "stroke-dasharray": "2 2" }, cg);
+      var ct = el("text", { x: cx + 20, y: yA, class: "callout" }, cg);
+      ct.textContent = "a US$0,1 billones de superar a Tesla";
+    }
+    if (animated) svg.classList.add("go");
+  }
+
+  function show(ev, d, i) {
+    svg.querySelectorAll(".row").forEach(function (r, j) { r.classList.toggle("dim", j !== i); });
+    var metric = d.hl ? "Valuación potencial diluida" : "Capitalización de mercado";
+    var extra = d.hl ? "Puesto 10 entre las empresas de EE.UU." :
+      "Equivale a " + (d.v / anth).toLocaleString("es-AR", { maximumFractionDigits: 1 }) + " veces Anthropic";
+    tip.innerHTML = "<b>#" + (i + 1) + " " + d.name + "</b><span class='m'>" + metric + "</span><span class='v'>US$" + n1(d.v) + " billones</span><span class='m'>" + extra + "</span>";
+    var rb = root.getBoundingClientRect(), px = ev.clientX - rb.left, py = ev.clientY - rb.top;
+    tip.classList.add("on");
+    var tw = tip.offsetWidth, left = px + 16;
+    if (left + tw > rb.width - 6) left = px - tw - 16;
+    tip.style.left = Math.max(6, left) + "px";
+    tip.style.top = (py + 16) + "px";
+  }
+  function hide() { tip.classList.remove("on"); svg.querySelectorAll(".row").forEach(function (r) { r.classList.remove("dim"); }); }
+
+  function table() {
+    var h = "<table><thead><tr><th>#</th><th>Empresa</th><th>Métrica</th><th class='n'>US$ billones</th></tr></thead><tbody>";
+    data.forEach(function (d, i) {
+      h += "<tr" + (d.hl ? " class='hl'" : "") + "><td>" + (i + 1) + "</td><td>" + d.name + "</td><td>" +
+           (d.hl ? "Valuación potencial diluida" : "Capitalización") + "</td><td class='n'>" + n1(d.v) + "</td></tr>";
+    });
+    document.getElementById("tableWrap").innerHTML = h + "</tbody></table>";
+  }
+
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var v = b.getAttribute("data-view");
+      document.querySelectorAll(".seg button").forEach(function (o) { o.setAttribute("aria-pressed", o === b); });
+      document.getElementById("chartWrap").hidden = v !== "chart";
+      document.getElementById("tableWrap").hidden = v !== "table";
+      hide();
+    });
+  });
+  document.addEventListener("touchstart", function (e) { if (!svg.contains(e.target)) hide(); }, { passive: true });
+
+  table(); draw();
+  function start() { if (animated) return; animated = true; requestAnimationFrame(function () { svg.classList.add("go"); }); }
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { start(); io.disconnect(); } }, { threshold: .25 });
+    io.observe(svg);
+  } else start();
+  var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(draw, 100); });
+})();
+</script>
+</body>
+</html>
