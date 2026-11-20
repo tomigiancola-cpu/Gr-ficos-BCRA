@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Una década de ciberataques</title>
+<style>
+.viz{--bg:#fff;--ink:#121212;--ink2:#4a4a4a;--ink3:#8c8c8c;--rule:#121212;--grid:#e6e6e6;--bar:#1f3a5f;--barh:#5b8cc0;--pnl:#f6f6f4;
+ --c1:#b5452c;--c2:#c49a2c;--c3:#2a78d6;--c4:#6250d6;--c5:#2e8b6e}
+@media (prefers-color-scheme:dark){.viz{--bg:#161616;--ink:#f2f2f2;--ink2:#c4c4c4;--ink3:#8a8a8a;--rule:#f2f2f2;--grid:#2c2c2c;--bar:#8fb3e0;--barh:#c9dbf2;--pnl:#202020;
+ --c1:#e0745a;--c2:#d9b04a;--c3:#3987e5;--c4:#9085e9;--c5:#4fb894}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg)}
+.viz{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);max-width:900px;margin:0 auto;padding:18px 18px 14px}
+.top{border-top:3px solid var(--rule);padding-top:10px}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:25px;line-height:1.2;margin:0 0 6px}
+.dek{font-size:14px;color:var(--ink2);margin:0 0 16px;line-height:1.45}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--grid);border-bottom:1px solid var(--grid);margin-bottom:14px}
+.st{padding:10px 12px 10px 0}.st+.st{border-left:1px solid var(--grid);padding-left:12px}
+.sl{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
+.sv{font-size:24px;font-weight:300;margin:4px 0 1px;font-variant-numeric:tabular-nums}
+.sd{font-size:12.5px;color:var(--ink2)}
+.bar1{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.seg{display:inline-flex;border:1px solid var(--ink3)}
+.seg button{all:unset;cursor:pointer;font-size:12px;padding:4px 10px;color:var(--ink2);white-space:nowrap}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.ct{font-size:13px;font-weight:700}
+.leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink2);margin:10px 0 4px}
+.leg span{display:inline-flex;align-items:center;gap:6px}.leg i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.box{position:relative}svg text{font-family:inherit}
+.tip{position:absolute;pointer-events:none;background:var(--bg);border:1px solid var(--ink3);padding:7px 10px;font-size:12.5px;opacity:0;transition:opacity .1s;z-index:3;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tip b{display:block;margin-bottom:2px}
+.ev{cursor:pointer}.ev:focus{outline:none}.ev:focus-visible circle{stroke:var(--ink);stroke-width:2}
+.panel{background:var(--pnl);border-left:4px solid var(--c);padding:12px 14px;margin-top:10px;min-height:118px}
+.panel .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);display:flex;gap:10px;flex-wrap:wrap}
+.panel .k em{font-style:normal;color:var(--c)}
+.panel h2{font-family:Georgia,serif;font-size:19px;margin:4px 0 6px}
+.panel p{margin:0;font-size:14px;line-height:1.5;color:var(--ink2)}
+.panel .nav{display:flex;gap:12px;margin-top:8px;font-size:12px}
+.panel .nav button{all:unset;cursor:pointer;color:var(--ink2);text-decoration:underline;text-underline-offset:2px}
+.hint{font-size:12px;color:var(--ink3);margin-top:4px}
+.foot{border-top:1px solid var(--grid);margin-top:12px;padding-top:8px;font-size:11.5px;color:var(--ink3);line-height:1.5}
+@media(max-width:600px){h1{font-size:20px}.stats{grid-template-columns:1fr}.st+.st{border-left:none;border-top:1px solid var(--grid);padding-left:0}.sv{font-size:20px}.panel h2{font-size:17px}}
+</style></head><body>
+<div class="viz">
+ <div class="top">
+  <h1>Los ciberataques crecieron 271% en la última década</h1>
+  <p class="dek">Ciberataques con relevancia política registrados en todo el mundo por el Repositorio Europeo de Ciberincidentes, y los casos más resonantes de cada año. Tocá cada punto para ver el caso.</p>
+ </div>
+ <div class="stats" id="stats"></div>
+ <div class="bar1"><span class="ct" id="ctitle"></span></div>
+ <div class="box" id="box"><svg id="main" role="img"></svg><div class="tip" id="tip"></div></div>
+ <div class="leg" id="leg"></div>
+ <div class="panel" id="panel" aria-live="polite"></div>
+ <div class="foot">Fuente: Repositorio Europeo de Ciberincidentes (EuRepoC). *2026 hasta el 20 de noviembre.</div>
+</div>
+<script>
+const Y=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+const LOSS=[1.45,1.42,2.71,3.5,4.2,6.9,10.3,12.5,16.6,20.877,null];
+const CMP=[298728,301580,351937,467361,791790,847376,800944,880418,859532,1008597,null];
+const RW=[167,140,126,93,80,176,378,755,795,711,620];
+const CAT={ran:["Ransomware","--c1"],cri:["Robo de criptoactivos y fondos","--c2"],dat:["Filtración de datos","--c3"],esp:["Espionaje y cadena de suministro","--c4"],sab:["Sabotaje y disrupción","--c5"]};
+const E=[
+ {y:2016,c:"cri",t:"Robo al Banco Central de Bangladesh",f:"Febrero de 2016",d:"Atacantes usaron la red SWIFT para ordenar transferencias desde la cuenta del banco en la Reserva Federal de Nueva York y se llevaron US$ 81 millones. El ataque se atribuyó a Lazarus, grupo vinculado a Corea del Norte."},
+ {y:2016,c:"sab",t:"Botnet Mirai y caída de Dyn",f:"Octubre de 2016",d:"Una red de cámaras y routers infectados lanzó un ataque de denegación de servicio contra el proveedor de DNS Dyn y dejó fuera de línea por horas a sitios como Twitter, Netflix y Spotify."},
+ {y:2016,c:"dat",t:"Yahoo",f:"Septiembre y diciembre de 2016",d:"Yahoo reveló dos robos de datos ocurridos en 2013 y 2014. El de 2013 terminó afectando a sus 3.000 millones de cuentas, la mayor filtración conocida hasta entonces."},
+ {y:2017,c:"ran",t:"WannaCry",f:"Mayo de 2017",d:"El ransomware infectó más de 200.000 computadoras en 150 países en pocos días, incluido el sistema de salud británico. Explotaba una vulnerabilidad de Windows filtrada de la NSA. EE.UU. y el Reino Unido lo atribuyeron a Corea del Norte."},
+ {y:2017,c:"sab",t:"NotPetya",f:"Junio de 2017",d:"Disfrazado de ransomware pero diseñado para destruir datos, se propagó desde Ucrania a empresas de todo el mundo como Maersk y Merck. La Casa Blanca estimó los daños en US$ 10.000 millones y lo atribuyó al ejército ruso."},
+ {y:2017,c:"dat",t:"Equifax",f:"Septiembre de 2017",d:"La agencia de crédito estadounidense informó el robo de datos personales, incluidos números de seguridad social, de unos 147 millones de personas por una falla sin parchear."},
+ {y:2018,c:"dat",t:"Marriott (Starwood)",f:"Noviembre de 2018",d:"La cadena hotelera reveló que la base de reservas de Starwood estaba comprometida desde 2014. La filtración alcanzó cerca de 383 millones de registros de huéspedes."},
+ {y:2019,c:"dat",t:"Capital One",f:"Julio de 2019",d:"Una exempleada de Amazon Web Services aprovechó una configuración errónea en la nube y accedió a datos de unos 106 millones de clientes en EE.UU. y Canadá."},
+ {y:2020,c:"esp",t:"SolarWinds",f:"Diciembre de 2020",d:"Hackers vinculados a la inteligencia rusa insertaron código malicioso en una actualización del software Orion. Unos 18.000 clientes la descargaron, entre ellos varias agencias del gobierno de EE.UU."},
+ {y:2020,c:"cri",t:"Hackeo de Twitter",f:"Julio de 2020",d:"Atacantes engañaron a empleados de Twitter y tomaron cuentas de Barack Obama, Elon Musk y Apple, entre otras, para promocionar una estafa con bitcoin."},
+ {y:2021,c:"ran",t:"Colonial Pipeline",f:"Mayo de 2021",d:"Un ataque del grupo DarkSide obligó a cerrar durante días el mayor oleoducto de combustibles de EE.UU. y generó faltantes en la costa este. La empresa pagó un rescate de US$ 4,4 millones."},
+ {y:2021,c:"ran",t:"Kaseya",f:"Julio de 2021",d:"El grupo REvil aprovechó el software de gestión remota de Kaseya para cifrar los sistemas de hasta 1.500 empresas en todo el mundo en un solo ataque."},
+ {y:2021,c:"dat",t:"RENAPER (Argentina)",f:"Octubre de 2021",d:"Un hacker difundió datos y fotos del DNI de figuras públicas obtenidos del Registro Nacional de las Personas. El Gobierno informó que se usaron credenciales de un organismo autorizado a consultar la base."},
+ {y:2021,c:"esp",t:"Log4Shell",f:"Diciembre de 2021",d:"Se descubrió una falla crítica en Log4j, una librería usada por millones de aplicaciones. Las agencias de ciberseguridad la calificaron como una de las vulnerabilidades más graves de la década."},
+ {y:2022,c:"cri",t:"Puente Ronin (Axie Infinity)",f:"Marzo de 2022",d:"Hackers de Lazarus robaron unos US$ 625 millones en criptoactivos del puente que conectaba el juego Axie Infinity con Ethereum."},
+ {y:2022,c:"ran",t:"Gobierno de Costa Rica",f:"Abril de 2022",d:"El grupo Conti atacó el Ministerio de Hacienda y otros organismos. El gobierno declaró la emergencia nacional, la primera de ese tipo por un ciberataque."},
+ {y:2023,c:"esp",t:"MOVEit",f:"Mayo de 2023",d:"El grupo Cl0p explotó una falla en el software de transferencia de archivos MOVEit y robó datos de más de 2.000 organizaciones, entre ellas bancos, universidades y organismos públicos."},
+ {y:2023,c:"ran",t:"MGM Resorts",f:"Septiembre de 2023",d:"Tras un engaño telefónico a la mesa de ayuda, atacantes paralizaron casinos y hoteles de MGM en Las Vegas durante días. La empresa estimó el impacto en unos US$ 100 millones."},
+ {y:2024,c:"ran",t:"Change Healthcare",f:"Febrero de 2024",d:"Un ataque de ransomware a la procesadora de pagos médicos de UnitedHealth paralizó farmacias y hospitales de EE.UU. y expuso datos de unos 190 millones de personas, la mayor filtración de salud del país."},
+ {y:2024,c:"esp",t:"Salt Typhoon",f:"Octubre–diciembre de 2024",d:"Se reveló que hackers vinculados a China habían penetrado las redes de varias de las principales telefónicas de EE.UU. y accedido a sistemas de escuchas judiciales."},
+ {y:2025,c:"cri",t:"Bybit",f:"Febrero de 2025",d:"Hackers norcoreanos robaron unos US$ 1.500 millones en ether del exchange Bybit, el mayor robo de criptoactivos registrado hasta ese momento."},
+ {y:2025,c:"sab",t:"Jaguar Land Rover",f:"Septiembre de 2025",d:"Un ciberataque obligó a la automotriz a frenar sus plantas en el Reino Unido durante semanas, con impacto en toda su cadena de proveedores."},
+ {y:2026,c:"sab",t:"Stryker",f:"Marzo de 2026",d:"El grupo Handala, que EE.UU. vincula con la inteligencia iraní, borró a distancia decenas de miles de dispositivos de empleados de la fabricante de tecnología médica. Las operaciones quedaron afectadas durante varios días y el golpe se sintió en sus resultados del primer trimestre."},
+ {y:2026,c:"esp",t:"Ataque a la cadena de suministro de software",f:"Marzo–abril de 2026",d:"Atacantes alteraron herramientas de código abierto y de seguridad muy usadas, como Trivy, la consola de Bitwarden y Checkmarx, para robar contraseñas y credenciales. Con ese acceso se robaron datos de OpenAI, Vercel y de la principal agencia de ciberseguridad de la Unión Europea."},
+ {y:2026,c:"esp",t:"Sistema de vigilancia del FBI",f:"Abril de 2026",d:"El FBI declaró un “incidente cibernético mayor” tras detectar el acceso a un sistema con información sobre objetivos de escuchas e intercepciones. Se acusó a espías chinos."},
+ {y:2026,c:"dat",t:"Canvas (Instructure)",f:"Mayo de 2026",d:"El grupo extorsivo ShinyHunters robó datos de más de 30 millones de estudiantes y docentes de la plataforma educativa y, ante la negativa a pagar, alteró sus páginas de acceso en plena temporada de exámenes. La empresa terminó pagando, pese a la recomendación del FBI."},
+ {y:2026,c:"sab",t:"Sistemas de agua en EE.UU.",f:"Julio de 2026",d:"Hackers vinculados a Irán atacaron a más de 100 proveedores de agua en Estados Unidos. En Minnesota, el grupo CyberAv3ngers alteró los sistemas de control de más de 30 servicios municipales de agua y dejó a los operadores sin acceso."},
+ {y:2026,c:"sab",t:"Boston Scientific",f:"Agosto de 2026",d:"Un ciberataque obligó a la fabricante de dispositivos médicos a desconectar su red global: frenó envíos y pedidos durante unas dos semanas y afectó a algunos pacientes."},
+ {y:2026,c:"dat",t:"Registro de personas de Dinamarca",f:"Septiembre de 2026",d:"Un atacante usó el acceso autorizado de una pequeña empresa informática al registro nacional de identidad danés y extrajo nombres, direcciones y números de identificación de unos 8,8 millones de personas, prácticamente toda la población."},
+ {y:2026,c:"cri",t:"Binance",f:"29 de octubre de 2026",d:"Atacantes vaciaron billeteras del exchange en diez blockchains, la mayor parte en unos 20 minutos. Binance estimó el impacto en unos US$ 6.300 millones, el mayor robo de criptoactivos de la historia, y prometió cubrir las pérdidas. Firmas de análisis lo atribuyeron a hackers norcoreanos."}
+];
+const nf=(v,d=0)=>v.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});
+document.getElementById("stats").innerHTML=
+ `<div class="st"><div class="sl">Ciberataques en 2026</div><div class="sv">${nf(RW[10])}</div><div class="sd">Hasta el 20/11 · ${nf(RW[9])} en todo 2025</div></div>`+
+ `<div class="st"><div class="sl">Récord anual</div><div class="sv">795</div><div class="sd">En 2024 · casi 5 veces los de 2016</div></div>`+
+ `<div class="st"><div class="sl">Mayor robo de criptoactivos</div><div class="sv">US$ 6.300 M</div><div class="sd">Binance, 29 de octubre de 2026</div></div>`;
+let mode="rw",sel=E.length-1,hov=-1;
+const leg=document.getElementById("leg");leg.innerHTML=Object.values(CAT).map(([n,c])=>`<span style="--c:var(${c})"><i></i>${n}</span>`).join("");
+document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{mode=b.dataset.m;document.querySelectorAll("#seg button").forEach(x=>x.setAttribute("aria-pressed",x===b));draw()});
+const box=document.getElementById("box"),M=document.getElementById("main"),tip=document.getElementById("tip"),panel=document.getElementById("panel");
+function showPanel(){const e=E[sel],[cn,cc]=CAT[e.c];panel.style.setProperty("--c",`var(${cc})`);
+ panel.innerHTML=`<div class="k"><span>${e.f}</span><em>${cn}</em></div><h2>${e.t}</h2><p>${e.d}</p><div class="nav"><button id="pv">← Anterior</button><button id="nx">Siguiente →</button><span style="color:var(--ink3)">${sel+1} de ${E.length}</span></div>`;
+ document.getElementById("pv").onclick=()=>{sel=(sel-1+E.length)%E.length;draw()};document.getElementById("nx").onclick=()=>{sel=(sel+1)%E.length;draw()}}
+function draw(){
+ const W=box.clientWidth,mob=W<600,V=mode==="loss"?LOSS:mode==="cmp"?CMP:RW;
+ document.getElementById("ctitle").textContent=mode==="loss"?"Pérdidas por delitos informáticos reportadas al FBI, EE.UU. (miles de millones de US$)":mode==="cmp"?"Denuncias por delitos informáticos recibidas por el FBI, EE.UU. (miles)":"Ciberataques con relevancia política registrados por año, mundo";
+ const maxE=Math.max(...Y.map(y=>E.filter(e=>e.y===y).length)),r=mob?7:8,step=r*2+5;
+ const m={t:22,r:6,l:mob?(mode==="loss"?26:40):46},chartH=mob?200:240,evH=maxE*step+14,H=m.t+chartH+26+evH;
+ M.setAttribute("width",W);M.setAttribute("height",H);
+ const cw=(W-m.l-m.r)/Y.length,X=i=>m.l+cw*(i+.5),bw=Math.min(46,cw*.62);
+ const vmax=mode==="loss"?25:mode==="cmp"?1200000:800,ticks=mode==="loss"?[0,5,10,15,20,25]:mode==="cmp"?[0,300000,600000,900000,1200000]:[0,200,400,600,800];
+ const fmtA=v=>mode==="loss"?v:mode==="cmp"?nf(v/1000):nf(v),fmtB=v=>mode==="loss"?nf(v,1):mode==="cmp"?nf(v/1000):nf(v);
+ const Yv=v=>m.t+chartH-(v/vmax)*chartH,base=m.t+chartH;
+ let h="";
+ ticks.forEach(v=>h+=`<line x1="${m.l}" x2="${W-m.r}" y1="${Yv(v)}" y2="${Yv(v)}" stroke="var(--grid)"/><text x="${m.l-6}" y="${Yv(v)+4}" text-anchor="end" font-size="11" fill="var(--ink3)">${fmtA(v)}</text>`);
+ Y.forEach((y,i)=>{const v=V[i],x=X(i);
+  if(v!=null){const top=Yv(v),act=hov===i||E[sel].y===y;
+   h+=`<rect x="${x-bw/2}" y="${top}" width="${bw}" height="${base-top}" fill="var(${act?"--barh":"--bar"})" rx="2"/>`;
+   if(!mob||i%3===0||i===10||i===8)h+=`<text x="${x}" y="${top-6}" text-anchor="middle" font-size="${mob?10:11}" font-weight="${i===10?700:400}" fill="var(--ink)">${fmtB(v)}${mode==="rw"&&i===10?"*":""}</text>`}
+  else if(mode!=="rw")h+=`<rect x="${x-bw/2}" y="${base-34}" width="${bw}" height="34" fill="none" stroke="var(--ink3)" stroke-dasharray="3,3"/><text x="${x}" y="${base-14}" text-anchor="middle" font-size="10" fill="var(--ink3)">${mob?"s/d":"sin dato"}</text>`;
+  h+=`<text x="${x}" y="${base+16}" text-anchor="middle" font-size="${mob?10.5:12}" font-weight="${E[sel].y===y?700:400}" fill="var(--ink2)">${mob?"'"+String(y).slice(2):y}</text>`;
+  h+=`<rect class="hit" data-i="${i}" x="${x-cw/2}" y="${m.t}" width="${cw}" height="${chartH}" fill="transparent"/>`});
+ h+=`<line x1="${m.l}" x2="${W-m.r}" y1="${base}" y2="${base}" stroke="var(--ink2)"/>`;
+ const ey=base+26;h+=`<text x="${m.l-6}" y="${ey+r+4}" text-anchor="end" font-size="10" fill="var(--ink3)">${mob?"":"Casos"}</text>`;
+ Y.forEach((y,i)=>{E.forEach((e,k)=>{if(e.y!==y)return;const j=E.filter((z,q)=>z.y===y&&q<k).length,cy=ey+r+j*step,s=k===sel;
+  h+=`<g class="ev" data-k="${k}" tabindex="0" role="button" aria-label="${e.t}, ${e.f}">${s?`<circle cx="${X(i)}" cy="${cy}" r="${r+3}" fill="none" stroke="var(${CAT[e.c][1]})" stroke-width="1.5"/>`:""}<circle cx="${X(i)}" cy="${cy}" r="${r}" fill="var(${CAT[e.c][1]})" stroke="var(--bg)" stroke-width="2"/><circle cx="${X(i)}" cy="${cy}" r="${r+4}" fill="transparent"/></g>`})});
+ M.innerHTML=h;
+ M.querySelectorAll(".ev").forEach(g=>{const k=+g.dataset.k;g.onclick=()=>{sel=k;draw()};g.onkeydown=ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();sel=k;draw()}};
+  g.onmouseenter=()=>{const e=E[k],b=g.getBoundingClientRect(),bb=box.getBoundingClientRect();tip.innerHTML=`<b>${e.t}</b>${e.f}`;tip.style.opacity=1;const tw=tip.offsetWidth;tip.style.left=Math.max(0,Math.min(W-tw,b.left-bb.left+b.width/2-tw/2))+"px";tip.style.top=(b.top-bb.top-tip.offsetHeight-6)+"px"};
+  g.onmouseleave=()=>tip.style.opacity=0});
+ M.querySelectorAll(".hit").forEach(rc=>{const i=+rc.dataset.i;
+  rc.onmouseenter=()=>{hov=i;const v=V[i],n=E.filter(e=>e.y===Y[i]).length;
+   tip.innerHTML=`<b>${Y[i]}</b>`+(v==null?(mode==="rw"?"Sin datos":"Informe anual aún no publicado"):(mode==="loss"?`Pérdidas: US$ ${nf(v*1000)} millones`:mode==="cmp"?`Denuncias: ${nf(v)}`:`Ciberataques registrados: ${nf(v)}${i===10?" (hasta el 20/11)":""}`)+(i&&V[i-1]!=null?`<br>${i===10&&mode==="rw"?"Frente a todo 2025":"Variación anual"}: ${(()=>{const p=(v/V[i-1]-1)*100;return(p>=0?"+":"−")+nf(Math.abs(p),0)+"%"})()}`:""))+`<br>${n} caso${n>1?"s":""} destacado${n>1?"s":""} abajo`;
+   tip.style.opacity=1;const tw=tip.offsetWidth,x=X(i);tip.style.left=Math.max(0,Math.min(W-tw,x+bw/2+8+tw>W?x-bw/2-8-tw:x+bw/2+8))+"px";tip.style.top=(m.t+20)+"px";
+   M.querySelectorAll("rect[rx]").forEach(()=>{})};
+  rc.onmouseleave=()=>{hov=-1;tip.style.opacity=0};
+  rc.onclick=()=>{const k=E.findIndex(e=>e.y===Y[i]);if(k>=0){sel=k;draw()}}});
+ showPanel();
+}
+window.addEventListener("resize",draw);draw();
+</script></body></html>
