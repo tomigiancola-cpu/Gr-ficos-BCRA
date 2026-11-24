@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMAE trimestral: cómo se configuró la recesión técnica</title>
+<style>*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--page);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.viz-root{
+  color-scheme:light;
+  --page:#f4f3ef; --surface:#fcfcfb; --surface-2:#f3f2ee;
+  --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+  --grid:#e6e5df; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
+  --accent:#12305a; --band:rgba(18,48,90,.055);
+  --s1:#1c5cab; --s2:#14a085; --s3:#d9822b;
+  --pos:#1c5cab; --neg:#d6453d;
+  --h-n3:#b42f2e; --h-n2:#e2685f; --h-n1:#f5c3bc; --h-0:#ecebe6; --h-p1:#c2d9f5; --h-p2:#5d97e0; --h-p3:#1c5cab;
+  --shadow:0 6px 24px rgba(11,11,11,.12);
+  color:var(--ink);
+}
+@media (prefers-color-scheme:dark){
+  :root:where(:not([data-theme="light"])) .viz-root{
+    color-scheme:dark;
+    --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
+    --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#45453f; --border:rgba(255,255,255,.10);
+    --accent:#8fb3e6; --band:rgba(143,179,230,.07);
+    --s1:#3987e5; --s2:#14a085; --s3:#d27a26;
+    --pos:#3d82dc; --neg:#e05a52;
+    --h-n3:#ef7f75; --h-n2:#b0453d; --h-n1:#6e3530; --h-0:#363633; --h-p1:#2b4a72; --h-p2:#2f69b3; --h-p3:#6aa3ec;
+    --shadow:0 6px 24px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"] .viz-root{
+  color-scheme:dark;
+  --page:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
+  --ink:#f0efec; --ink-2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#45453f; --border:rgba(255,255,255,.10);
+  --accent:#8fb3e6; --band:rgba(143,179,230,.07);
+  --s1:#3987e5; --s2:#14a085; --s3:#d27a26;
+  --pos:#3d82dc; --neg:#e05a52;
+  --h-n3:#ef7f75; --h-n2:#b0453d; --h-n1:#6e3530; --h-0:#363633; --h-p1:#2b4a72; --h-p2:#2f69b3; --h-p3:#6aa3ec;
+  --shadow:0 6px 24px rgba(0,0,0,.5);
+}
+.viz-root{max-width:1120px;margin:0 auto;padding:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:22px 24px 18px;border-top:3px solid var(--accent)}
+.kicker{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
+h1{font-size:clamp(20px,2.6vw,26px);line-height:1.2;font-weight:700;margin:0 0 16px;letter-spacing:-.01em;text-wrap:balance}
+.dek{font-size:14.5px;line-height:1.45;color:var(--ink-2);margin:0 0 18px;max-width:780px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:0 0 18px}
+.tile{border:1px solid var(--border);border-radius:6px;padding:12px 14px 11px;background:var(--surface)}
+.tile .lab{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);margin-bottom:4px}
+.tile .val{font-size:30px;font-weight:650;line-height:1.1;letter-spacing:-.01em}
+.tile .sub{font-size:12px;color:var(--muted);margin-top:3px}
+.tile .dir{font-size:13px;margin-right:4px}
+.key-line{display:inline-block;width:16px;height:0;border-top:2.5px solid currentColor;border-radius:2px;flex:none}
+.key-rect{display:inline-block;width:10px;height:10px;border-radius:2px;background:currentColor;flex:none}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 10px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink-2);padding:6px 12px;cursor:pointer;border-right:1px solid var(--border)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface);font-weight:600}
+.seg button:hover:not([aria-pressed="true"]){background:var(--surface-2)}
+.ctl-label{font-size:12px;color:var(--muted);margin-right:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:4px 0 6px}
+.legend button,.legend span.li{font:inherit;font-size:13px;color:var(--ink);background:none;border:0;padding:3px 0;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.legend span.li{cursor:default}
+.legend button[aria-pressed="false"]{color:var(--muted);text-decoration:line-through}
+.legend button[aria-pressed="false"] .key-line,.legend button[aria-pressed="false"] .key-rect{opacity:.3}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;overflow:visible}
+.chart svg:focus{outline:none}
+.chart svg:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:2px}
+svg text{font-family:inherit}
+.tick{font-size:11.5px;fill:var(--muted);font-variant-numeric:tabular-nums}
+.yr{font-size:12px;fill:var(--ink-2);font-weight:600}
+.dlabel{font-size:12px;fill:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.dlabel-2{font-size:11.5px;fill:var(--ink-2);font-variant-numeric:tabular-nums}
+.annot{font-size:12px;fill:var(--ink-2)}
+.annot-b{font-size:12px;fill:var(--ink);font-weight:600}
+.halo{paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round}
+.tt{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:6px;padding:9px 11px;font-size:12.5px;min-width:170px;opacity:0;transition:opacity .08s;z-index:5}
+.tt.on{opacity:1}
+.tt .tt-h{font-size:12px;color:var(--ink-2);margin-bottom:6px;font-weight:600}
+.tt .row{display:flex;align-items:center;gap:8px;margin:3px 0;white-space:nowrap}
+.tt .row b{font-weight:650;font-variant-numeric:tabular-nums;min-width:52px;color:var(--ink)}
+.tt .row span.n{color:var(--ink-2)}
+.tt .foot{margin-top:6px;padding-top:6px;border-top:1px solid var(--border);color:var(--muted);font-size:11.5px;white-space:nowrap}
+.panel-title{font-size:15px;font-weight:650;margin:22px 0 2px}
+.panel-dek{font-size:13px;color:var(--ink-2);margin:0 0 8px}
+.callout{border-left:3px solid var(--accent);background:var(--band);padding:9px 12px;font-size:13.5px;line-height:1.45;color:var(--ink);margin:10px 0 4px;border-radius:0 4px 4px 0}
+.foot-wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:10px 20px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.source{font-size:12px;color:var(--muted);line-height:1.5;max-width:760px}
+.source a{color:var(--ink-2)}
+.actions{display:flex;gap:8px;flex:none}
+.btn{font:inherit;font-size:12.5px;border:1px solid var(--border);background:var(--surface);color:var(--ink);padding:6px 11px;border-radius:6px;cursor:pointer}
+.btn:hover{background:var(--surface-2)}
+.tbl-wrap{display:none;margin-top:12px;max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:6px}
+.tbl-wrap.on{display:block}
+table.data{border-collapse:collapse;width:100%;font-size:12.5px}
+table.data th,table.data td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap;font-variant-numeric:tabular-nums}
+table.data th:first-child,table.data td:first-child{text-align:left}
+table.data thead th{position:sticky;top:0;background:var(--surface-2);color:var(--ink-2);font-weight:600;z-index:1}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+select.sel{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 8px}
+.stepper{display:inline-flex;align-items:center;gap:6px}
+.stepper .btn{padding:5px 9px;line-height:1}
+.tile .val.sm{font-size:22px}
+.tile .lab .short{display:none}
+.heat-wrap{display:flex;align-items:flex-start}
+#heatLabels{flex:none}
+.heat-scroll{flex:1;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.bins{display:flex;flex-wrap:wrap;gap:4px 12px;margin:6px 0 8px;font-size:12px;color:var(--ink-2)}
+.bins span{display:inline-flex;align-items:center;gap:6px}
+.bins i{display:inline-block;width:18px;height:11px;border-radius:2px}
+.hint{font-size:12px;color:var(--muted);margin:2px 0 0}
+@media (max-width:640px){.card{padding:16px 14px 14px}.viz-root{padding:8px}.tiles{grid-template-columns:repeat(auto-fit,minmax(102px,1fr));gap:8px}.tile{padding:9px 10px}.tile .val{font-size:21px}.tile .val.sm{font-size:18px}.tile .lab{font-size:11.5px}.tile .sub{font-size:11px}.tiles.four{grid-template-columns:repeat(2,1fr)}.tile .lab .full{display:none}.tile .lab .short{display:inline}}
+@media print{.controls,.actions,.tt{display:none!important}.viz-root{padding:0}}
+</style>
+</head>
+<body>
+<div class="viz-root">
+<article class="card">
+  <p class="kicker">Actividad económica · EMAE trimestral</p>
+  <h1>Dos trimestres seguidos en baja: la actividad entró en recesión técnica</h1>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="controls">
+    <div><span class="ctl-label">Comparar</span><div class="seg" id="mode"></div></div>
+  </div>
+  <div class="legend" id="legendA"></div>
+  <div class="chart" id="chartA"></div>
+
+  <h2 class="panel-title">Cómo se gestó: el derrumbe de julio hundió el promedio del tercer trimestre</h2>
+  <div class="legend" id="legendB"></div>
+  <div class="chart" id="chartB"></div>
+
+  <div class="foot-wrap">
+    <div class="source" id="source"></div>
+    <div class="actions">
+      <button class="btn" id="btnTbl" type="button" aria-expanded="false">Ver tabla</button>
+    </div>
+  </div>
+  <div class="tbl-wrap" id="tbl"></div>
+</article>
+</div>
+<script>
+const DATA={"monthly": [{"d": "2023-01", "o": 143.0, "yoy": 2.4, "sa": 149.6, "sam": 0.6, "tc": 149.5, "tcm": -0.3}, {"d": "2023-02", "o": 137.3, "yoy": -0.4, "sa": 150.2, "sam": 0.4, "tc": 149.1, "tcm": -0.2}, {"d": "2023-03", "o": 155.1, "yoy": 0.7, "sa": 150.9, "sam": 0.5, "tc": 148.8, "tcm": -0.2}, {"d": "2023-04", "o": 150.1, "yoy": -4.8, "sa": 147.3, "sam": -2.4, "tc": 148.5, "tcm": -0.2}, {"d": "2023-05", "o": 153.8, "yoy": -6.6, "sa": 145.4, "sam": -1.3, "tc": 148.1, "tcm": -0.2}, {"d": "2023-06", "o": 152.6, "yoy": -5.5, "sa": 145.9, "sam": 0.3, "tc": 147.7, "tcm": -0.3}, {"d": "2023-07", "o": 150.2, "yoy": -1.5, "sa": 148.8, "sam": 2.0, "tc": 147.3, "tcm": -0.3}, {"d": "2023-08", "o": 151.9, "yoy": 0.3, "sa": 150.3, "sam": 1.0, "tc": 146.8, "tcm": -0.3}, {"d": "2023-09", "o": 148.4, "yoy": -0.5, "sa": 149.9, "sam": -0.3, "tc": 146.3, "tcm": -0.4}, {"d": "2023-10", "o": 147.5, "yoy": 0.7, "sa": 147.9, "sam": -1.3, "tc": 145.8, "tcm": -0.4}, {"d": "2023-11", "o": 146.4, "yoy": -1.1, "sa": 146.4, "sam": -1.0, "tc": 145.2, "tcm": -0.4}, {"d": "2023-12", "o": 139.3, "yoy": -4.7, "sa": 143.0, "sam": -2.3, "tc": 144.7, "tcm": -0.3}, {"d": "2024-01", "o": 137.4, "yoy": -4.0, "sa": 143.1, "sam": 0.1, "tc": 144.3, "tcm": -0.3}, {"d": "2024-02", "o": 133.5, "yoy": -2.8, "sa": 143.9, "sam": 0.6, "tc": 144.1, "tcm": -0.2}, {"d": "2024-03", "o": 142.4, "yoy": -8.2, "sa": 142.2, "sam": -1.2, "tc": 144.0, "tcm": 0.0}, {"d": "2024-04", "o": 147.3, "yoy": -1.9, "sa": 140.8, "sam": -1.0, "tc": 144.2, "tcm": 0.1}, {"d": "2024-05", "o": 156.8, "yoy": 1.9, "sa": 142.8, "sam": 1.4, "tc": 144.6, "tcm": 0.3}, {"d": "2024-06", "o": 147.4, "yoy": -3.4, "sa": 143.2, "sam": 0.3, "tc": 145.1, "tcm": 0.4}, {"d": "2024-07", "o": 149.7, "yoy": -0.4, "sa": 147.4, "sam": 3.0, "tc": 145.9, "tcm": 0.5}, {"d": "2024-08", "o": 147.3, "yoy": -3.1, "sa": 148.4, "sam": 0.7, "tc": 146.7, "tcm": 0.6}, {"d": "2024-09", "o": 144.8, "yoy": -2.4, "sa": 148.1, "sam": -0.2, "tc": 147.6, "tcm": 0.6}, {"d": "2024-10", "o": 148.1, "yoy": 0.4, "sa": 149.2, "sam": 0.7, "tc": 148.4, "tcm": 0.6}, {"d": "2024-11", "o": 148.2, "yoy": 1.2, "sa": 150.8, "sam": 1.1, "tc": 149.3, "tcm": 0.5}, {"d": "2024-12", "o": 148.7, "yoy": 6.7, "sa": 151.4, "sam": 0.4, "tc": 150.0, "tcm": 0.5}, {"d": "2025-01", "o": 146.5, "yoy": 6.6, "sa": 151.6, "sam": 0.1, "tc": 150.6, "tcm": 0.4}, {"d": "2025-02", "o": 141.4, "yoy": 5.9, "sa": 153.6, "sam": 1.3, "tc": 151.1, "tcm": 0.3}, {"d": "2025-03", "o": 150.6, "yoy": 5.8, "sa": 149.3, "sam": -2.8, "tc": 151.5, "tcm": 0.3}, {"d": "2025-04", "o": 158.9, "yoy": 7.9, "sa": 152.0, "sam": 1.8, "tc": 151.9, "tcm": 0.2}, {"d": "2025-05", "o": 165.1, "yoy": 5.3, "sa": 151.9, "sam": 0.0, "tc": 152.1, "tcm": 0.2}, {"d": "2025-06", "o": 156.8, "yoy": 6.4, "sa": 150.7, "sam": -0.8, "tc": 152.4, "tcm": 0.2}, {"d": "2025-07", "o": 153.8, "yoy": 2.8, "sa": 151.8, "sam": 0.7, "tc": 152.7, "tcm": 0.2}, {"d": "2025-08", "o": 150.4, "yoy": 2.1, "sa": 153.2, "sam": 0.9, "tc": 152.9, "tcm": 0.2}, {"d": "2025-09", "o": 151.7, "yoy": 4.8, "sa": 153.6, "sam": 0.3, "tc": 153.2, "tcm": 0.2}, {"d": "2025-10", "o": 152.8, "yoy": 3.2, "sa": 153.3, "sam": -0.2, "tc": 153.4, "tcm": 0.1}, {"d": "2025-11", "o": 148.0, "yoy": -0.1, "sa": 152.9, "sam": -0.3, "tc": 153.6, "tcm": 0.1}, {"d": "2025-12", "o": 153.9, "yoy": 3.5, "sa": 155.9, "sam": 2.0, "tc": 153.7, "tcm": 0.1}, {"d": "2026-01", "o": 149.4, "yoy": 2.0, "sa": 156.0, "sam": 0.1, "tc": 153.8, "tcm": 0.1}, {"d": "2026-02", "o": 139.4, "yoy": -1.5, "sa": 152.9, "sam": -2.0, "tc": 153.9, "tcm": 0.0}, {"d": "2026-03", "o": 160.3, "yoy": 6.4, "sa": 156.6, "sam": 2.5, "tc": 153.8, "tcm": 0.0}, {"d": "2026-04", "o": 162.3, "yoy": 2.1, "sa": 154.1, "sam": -1.6, "tc": 153.8, "tcm": 0.0}, {"d": "2026-05", "o": 166.2, "yoy": 0.7, "sa": 153.0, "sam": -0.7, "tc": 153.7, "tcm": 0.0}, {"d": "2026-06", "o": 161.7, "yoy": 3.1, "sa": 153.8, "sam": 0.5, "tc": 153.6, "tcm": 0.0}, {"d": "2026-07", "o": 151.4, "yoy": -1.5, "sa": 149.9, "sam": -2.5, "tc": 153.6, "tcm": 0.0}, {"d": "2026-08", "o": 147.9, "yoy": -1.6, "sa": 150.6, "sam": 0.4, "tc": 153.5, "tcm": 0.0}, {"d": "2026-09", "o": 149.9, "yoy": -1.2, "sa": 152.2, "sam": 1.1, "tc": 153.5, "tcm": 0.0}], "quarters": [{"k": "1T-23", "y": 2023, "q": 1, "sa": 150.23333333333332, "o": 145.13333333333333, "qq": null, "yy": 0.8987519967464497, "months": ["2023-01", "2023-02", "2023-03"]}, {"k": "2T-23", "y": 2023, "q": 2, "sa": 146.20000000000002, "o": 152.16666666666666, "qq": -2.684712669181255, "yy": -5.646268449726932, "months": ["2023-04", "2023-05", "2023-06"]}, {"k": "3T-23", "y": 2023, "q": 3, "sa": 149.66666666666666, "o": 150.16666666666666, "qq": 2.371181030551739, "yy": -0.5691508542469137, "months": ["2023-07", "2023-08", "2023-09"]}, {"k": "4T-23", "y": 2023, "q": 4, "sa": 145.76666666666668, "o": 144.4, "qq": -2.605790645879713, "yy": -1.6958103994382245, "months": ["2023-10", "2023-11", "2023-12"]}, {"k": "1T-24", "y": 2024, "q": 1, "sa": 143.06666666666666, "o": 137.76666666666668, "qq": -1.8522753258632618, "yy": -5.075792374827726, "months": ["2024-01", "2024-02", "2024-03"]}, {"k": "2T-24", "y": 2024, "q": 2, "sa": 142.26666666666668, "o": 150.5, "qq": -0.5591798695246841, "yy": -1.0952902519167473, "months": ["2024-04", "2024-05", "2024-06"]}, {"k": "3T-24", "y": 2024, "q": 3, "sa": 147.96666666666667, "o": 147.26666666666668, "qq": 4.006560449859409, "yy": -1.9311875693673541, "months": ["2024-07", "2024-08", "2024-09"]}, {"k": "4T-24", "y": 2024, "q": 4, "sa": 150.46666666666667, "o": 148.33333333333334, "qq": 1.6895697229105666, "yy": 2.723915050784864, "months": ["2024-10", "2024-11", "2024-12"]}, {"k": "1T-25", "y": 2025, "q": 1, "sa": 151.5, "o": 146.16666666666666, "qq": 0.6867523260965847, "yy": 6.097265908541005, "months": ["2025-01", "2025-02", "2025-03"]}, {"k": "2T-25", "y": 2025, "q": 2, "sa": 151.53333333333333, "o": 160.26666666666668, "qq": 0.022002200220017087, "yy": 6.48947951273533, "months": ["2025-04", "2025-05", "2025-06"]}, {"k": "3T-25", "y": 2025, "q": 3, "sa": 152.86666666666667, "o": 151.96666666666667, "qq": 0.87989441267049, "yy": 3.1914893617021267, "months": ["2025-07", "2025-08", "2025-09"]}, {"k": "4T-25", "y": 2025, "q": 4, "sa": 154.03333333333333, "o": 151.5666666666667, "qq": 0.7631923244657557, "yy": 2.179775280898877, "months": ["2025-10", "2025-11", "2025-12"]}, {"k": "1T-26", "y": 2026, "q": 1, "sa": 155.16666666666666, "o": 149.70000000000002, "qq": 0.7357714780350522, "yy": 2.4173318129988797, "months": ["2026-01", "2026-02", "2026-03"]}, {"k": "2T-26", "y": 2026, "q": 2, "sa": 153.63333333333333, "o": 163.4, "qq": -0.9881847475832428, "yy": 1.955074875207985, "months": ["2026-04", "2026-05", "2026-06"]}, {"k": "3T-26", "y": 2026, "q": 3, "sa": 150.9, "o": 149.73333333333335, "qq": -1.779127793447599, "yy": -1.4696205308181498, "months": ["2026-07", "2026-08", "2026-09"]}], "sectors": [{"l": "A", "s": "Agro", "f": "Agricultura, ganadería, caza y silvicultura", "v": [-21.3, -12.1, -18.0, -40.0, -49.1, -44.0, -14.0, -3.0, -1.8, 1.1, 4.6, 9.6, 10.2, 2.1, 11.3, 64.2, 95.9, 76.2, 25.4, 6.0, 4.4, 4.0, 2.8, 9.6, 2.9, 6.2, 7.7, 7.1, 4.9, 5.1, 1.7, -0.5, 1.4, 5.7, 11.5, 32.0, 24.4, 8.8, 22.2, 11.4, 4.8, 5.3, 1.0, -0.5, -2.0]}, {"l": "B", "s": "Pesca", "f": "Pesca", "v": [64.2, -16.6, -6.7, -67.5, -17.2, 7.8, 20.5, -18.2, 9.6, 21.0, -25.5, 11.3, -12.8, 29.7, 1.6, 171.6, -3.9, 35.8, -5.6, 22.1, -19.0, -31.2, 156.2, -13.8, -2.3, 28.1, 8.2, -18.5, 7.4, -68.2, -75.3, 0.4, 53.0, 65.7, -17.6, 18.9, 46.7, 13.8, 27.6, -19.7, -20.2, 250.1, 320.1, -14.0, -48.6]}, {"l": "C", "s": "Minería", "f": "Explotación de minas y canteras", "v": [12.3, 11.3, 9.1, 6.9, 6.6, 9.1, 8.0, 7.0, 8.0, 6.2, 8.7, 7.9, 7.3, 11.3, 6.5, 8.7, 7.5, 3.7, 5.8, 6.5, 8.4, 8.6, 7.9, 7.5, 8.7, 5.2, 5.8, 4.6, 4.8, 11.2, 13.5, 9.4, 8.0, 8.2, 7.2, 9.8, 10.5, 10.1, 16.4, 17.1, 16.2, 15.8, 8.9, 11.1, 11.1]}, {"l": "D", "s": "Industria manufacturera", "f": "Industria manufacturera", "v": [7.6, -1.7, 3.4, 1.2, -0.5, -5.2, -2.8, -2.8, -3.1, -1.3, -5.0, -12.2, -11.4, -8.6, -20.1, -16.0, -14.8, -19.8, -5.6, -6.4, -6.2, -1.6, -1.5, 7.9, 6.2, 5.1, 4.3, 8.2, 5.5, 8.3, -1.1, -4.6, -0.8, -2.9, -8.2, -4.2, -2.7, -8.5, 5.2, -2.6, -5.6, 1.9, -4.8, -3.3, -1.8]}, {"l": "E", "s": "Electricidad, gas y agua", "f": "Electricidad, gas y agua", "v": [1.3, 5.7, 13.0, -4.1, -7.6, -7.4, -0.6, 1.2, 7.6, 0.1, -2.0, -12.2, -5.7, 8.3, -7.8, 1.7, 11.7, -3.8, 4.3, 1.9, -4.8, -1.1, -4.6, 3.0, 6.2, 0.1, -3.9, -4.1, -8.7, 9.0, -2.2, -1.7, 1.3, 2.1, 1.7, 9.7, -2.5, -5.8, 5.8, 6.9, 9.1, -0.2, 2.4, 4.5, 4.0]}, {"l": "F", "s": "Construcción", "f": "Construcción", "v": [5.7, 0.5, 4.1, 0.4, 0.9, 0.6, -0.5, 2.0, 0.0, 2.7, 0.0, -5.9, -15.6, -17.5, -26.7, -24.5, -21.8, -23.3, -13.1, -16.6, -15.3, -14.8, -14.5, -7.0, 2.6, 4.6, 10.8, 16.1, 6.1, 9.1, 0.8, -0.7, 2.4, 3.7, -2.7, -0.2, -0.5, -0.4, 8.0, -2.2, 1.7, 1.4, -3.0, -2.8, 3.5]}, {"l": "G", "s": "Comercio", "f": "Comercio mayorista, minorista y reparaciones", "v": [5.5, 1.0, 4.6, 1.2, 2.2, 1.2, -0.8, 1.1, -1.5, 0.5, -2.7, -10.1, -7.5, -4.9, -15.3, -14.9, -13.1, -18.8, -4.9, -6.6, -5.9, -0.1, 0.6, 9.3, 9.0, 6.8, 7.3, 14.4, 9.1, 10.4, 1.0, -3.0, 0.6, 0.2, -6.0, -1.2, -1.1, -3.5, 4.5, -0.9, -2.0, 3.2, -4.8, -3.0, -2.2]}, {"l": "H", "s": "Hoteles y restaurantes", "f": "Hoteles y restaurantes", "v": [8.1, 5.5, 6.1, -0.9, 1.6, 1.7, 7.9, 7.8, 9.2, 6.4, 6.9, 8.5, -1.6, -1.7, -1.3, -3.7, -2.8, -2.0, 7.9, 9.3, 6.9, 15.7, 17.1, 17.4, 9.7, 8.8, 9.5, 17.3, 18.2, 16.6, 6.9, 8.2, 7.4, 1.2, 2.7, 2.0, 2.0, 3.6, 2.9, 1.9, 2.0, 1.1, 3.5, 3.2, 3.4]}, {"l": "I", "s": "Transporte y comunicaciones", "f": "Transporte y comunicaciones", "v": [3.7, 0.0, -1.1, -3.3, -3.4, -3.3, -0.8, 0.4, 0.4, -0.9, 0.1, -0.4, 0.1, -0.1, -0.7, 1.1, 2.8, 0.9, 1.3, -1.8, -0.2, 1.6, 1.2, 3.1, 2.8, 2.9, 2.0, 2.4, 0.9, 1.5, 0.9, 2.8, 2.8, 2.6, 1.9, 1.8, 2.3, -0.9, 5.1, 2.2, 0.9, 1.7, -1.6, -1.8, -0.7]}, {"l": "J", "s": "Intermediación financiera", "f": "Intermediación financiera", "v": [-2.3, -3.9, -2.3, -4.1, -3.4, -4.3, -1.1, -0.6, -0.9, 3.8, -2.6, -11.0, -11.3, -11.7, -15.3, -9.4, -8.8, -10.2, -2.3, -3.2, 0.0, 0.5, 7.6, 16.6, 25.8, 29.6, 29.1, 27.9, 25.8, 28.0, 21.6, 25.0, 38.8, 23.5, 14.5, 14.2, 6.8, 5.6, 8.7, 5.5, 2.8, 6.1, -3.0, -3.8, -11.5]}, {"l": "K", "s": "Inmobiliarias y empresariales", "f": "Actividades inmobiliarias, empresariales y de alquiler", "v": [3.2, 1.5, 2.8, 1.6, 1.4, 1.7, 0.1, 1.4, 1.2, 2.9, 1.2, -0.1, -0.9, -0.4, -3.3, -1.5, -0.8, -1.5, 0.1, -0.9, -0.5, 0.6, 1.3, 4.2, 3.8, 4.4, 4.5, 6.0, 3.3, 4.7, 3.8, 2.4, 4.8, 3.8, 0.5, 1.4, 0.1, -0.2, 2.8, 0.1, 0.4, 1.6, 0.2, 0.1, -0.3]}, {"l": "L", "s": "Administración pública", "f": "Administración pública y defensa; planes de seguridad social de afiliación obligatoria", "v": [1.8, 1.8, 1.7, 1.9, 2.2, 2.1, 2.3, 2.4, 2.6, 2.7, 2.5, 2.7, 0.7, 0.5, -0.4, -0.8, -1.1, -1.5, -1.5, -1.8, -2.1, -2.3, -2.4, -2.7, -1.4, -1.4, -1.4, -1.0, -1.1, -1.0, -1.2, -1.1, -1.1, -1.3, -1.3, -1.3, -1.4, -1.4, -1.3, -1.4, -1.4, -1.5, -1.6, -1.7, -1.7]}, {"l": "M", "s": "Enseñanza", "f": "Enseñanza", "v": [2.7, 2.5, 2.7, 2.6, 2.7, 2.7, 2.2, 2.3, 2.1, 2.2, 2.0, 2.1, 1.7, 1.8, 0.9, 0.7, 0.4, 0.2, 0.4, 0.2, 0.0, 0.5, 0.4, 0.3, 0.4, -0.1, 0.4, 0.6, 0.5, 0.6, 0.6, 0.5, 0.8, 0.2, 0.1, 0.1, -0.2, 0.4, 0.2, 0.1, 0.1, 0.1, -0.1, -0.2, -0.5]}, {"l": "N", "s": "Servicios sociales y salud", "f": "Servicios sociales y de salud", "v": [0.9, 0.5, 1.1, 1.4, 1.5, 1.5, 1.5, 1.8, 1.6, 1.9, 2.1, 2.0, 1.8, 1.5, 0.8, 0.7, 0.0, -0.4, -0.4, -0.9, -1.0, -1.2, -1.4, -1.4, -0.6, -1.0, -0.7, -0.4, -0.3, 0.0, -0.3, 0.1, 0.3, 0.1, 0.0, 0.0, 0.2, 0.5, 0.4, 0.4, 0.4, 0.6, 0.3, 0.2, 0.7]}, {"l": "O", "s": "Otros servicios", "f": "Otras actividades de servicios comunitarias, sociales y personales", "v": [5.8, 4.4, 2.3, 1.5, 2.6, 1.7, 2.2, 0.9, 2.0, -0.1, 0.5, 1.4, -0.9, -1.7, -2.4, -2.8, -4.8, -4.0, -3.8, -3.4, -4.9, -3.5, -4.5, -3.3, -1.8, -1.8, -0.3, 2.4, 1.3, -0.9, -0.3, 0.2, 2.5, 1.5, 1.0, 2.0, 0.3, 0.7, 1.0, -1.3, -1.5, 0.1, -1.0, -0.8, -2.2]}], "taxes": [0.2, -3.6, -0.7, -5.5, -2.6, -5.2, -4.1, 0.2, -3.7, -1.9, -4.0, -9.8, -5.1, -3.0, -9.8, -4.3, -2.0, -4.2, 0.8, -4.1, -0.9, 3.1, 4.9, 14.2, 13.6, 11.4, 9.3, 11.8, 8.2, 8.4, 8.1, 8.8, 10.5, 8.0, 3.4, 5.1, 1.6, -3.8, 7.1, 2.4, 0.9, 2.1, -4.6, -4.2, -1.3], "meta": {"release": "24 de noviembre de 2026", "ref": "septiembre de 2026", "url": "https://www.indec.gob.ar/uploads/informesdeprensa/emae_11_26C3D902DB86.pdf", "sepReq": 6.507304116865886, "pib2T26": -0.6}};
+// ---- utilidades compartidas ----
+(function(){
+  try{
+    var t=new URLSearchParams(location.search).get('tema');
+    if(t==='claro') document.documentElement.setAttribute('data-theme','light');
+    if(t==='oscuro') document.documentElement.setAttribute('data-theme','dark');
+  }catch(e){}
+})();
+const NS='http://www.w3.org/2000/svg';
+const F1=new Intl.NumberFormat('es-AR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MES3=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const MES1=['E','F','M','A','M','J','J','A','S','O','N','D'];
+function r1(v){return Math.round(v*10)/10}
+function pct(v,opt){
+  if(v==null||isNaN(v))return 'n/d';
+  const r=r1(v); const s=F1.format(Math.abs(r));
+  const sign=r>0?'+':(r<0?'−':'');
+  return sign+s+((opt&&opt.noPct)?'':'%');
+}
+function num(v){return v==null?'n/d':F1.format(r1(v))}
+function mesLargo(d){const[y,m]=d.split('-');const s=MES[+m-1];return s[0].toUpperCase()+s.slice(1)+' '+y}
+function mesCorto(d){const[y,m]=d.split('-');return MES3[+m-1]+'-'+y.slice(2)}
+function el(tag,attrs,parent,text){
+  const e=document.createElementNS(NS,tag);
+  if(attrs)for(const k in attrs){if(attrs[k]!=null)e.setAttribute(k,attrs[k])}
+  if(text!=null)e.textContent=text;
+  if(parent)parent.appendChild(e);
+  return e;
+}
+function h(tag,cls,parent,text){
+  const e=document.createElement(tag);
+  if(cls)e.className=cls;
+  if(text!=null)e.textContent=text;
+  if(parent)parent.appendChild(e);
+  return e;
+}
+function niceStep(range,count){
+  const raw=range/Math.max(1,count);const p=Math.pow(10,Math.floor(Math.log10(raw)));const n=raw/p;
+  return (n<1.5?1:n<3?2:n<7?5:10)*p;
+}
+function niceDomain(min,max,count){
+  if(min===max){min-=1;max+=1}
+  const st=niceStep(max-min,count||5);
+  const lo=Math.floor(min/st)*st, hi=Math.ceil(max/st)*st;
+  const ticks=[];for(let v=lo;v<=hi+st*1e-6;v+=st)ticks.push(Math.round(v/st)*st);
+  return {lo,hi,ticks,st};
+}
+// columna/barra: extremo de dato redondeado (4px), base recta
+function colPath(x,w,yBase,yVal,r){
+  const up=yVal<yBase; const hgt=Math.abs(yBase-yVal); r=Math.min(r,hgt,w/2);
+  if(hgt<0.5)return '';
+  if(up){return `M${x},${yBase}V${yVal+r}Q${x},${yVal} ${x+r},${yVal}H${x+w-r}Q${x+w},${yVal} ${x+w},${yVal+r}V${yBase}Z`}
+  return `M${x},${yBase}V${yVal-r}Q${x},${yVal} ${x+r},${yVal}H${x+w-r}Q${x+w},${yVal} ${x+w},${yVal-r}V${yBase}Z`;
+}
+function barPathH(xBase,xVal,y,hgt,r){
+  const right=xVal>xBase; const w=Math.abs(xVal-xBase); r=Math.min(r,w,hgt/2);
+  if(w<0.5)return '';
+  if(right)return `M${xBase},${y}H${xVal-r}Q${xVal},${y} ${xVal},${y+r}V${y+hgt-r}Q${xVal},${y+hgt} ${xVal-r},${y+hgt}H${xBase}Z`;
+  return `M${xBase},${y}H${xVal+r}Q${xVal},${y} ${xVal},${y+r}V${y+hgt-r}Q${xVal},${y+hgt} ${xVal+r},${y+hgt}H${xBase}Z`;
+}
+// tooltip
+function Tooltip(container){
+  const d=h('div','tt',container);d.setAttribute('role','status');d.setAttribute('aria-live','polite');
+  return {
+    el:d,
+    show(build,px,py){
+      d.replaceChildren();build(d);d.classList.add('on');
+      const cw=container.clientWidth;const tw=d.offsetWidth,th=d.offsetHeight;
+      let x=px+14; if(x+tw>cw)x=px-tw-14; if(x<0)x=Math.max(0,Math.min(cw-tw,px-tw/2));
+      let y=py-th-10; if(y<0)y=py+16;
+      d.style.left=x+'px';d.style.top=y+'px';
+    },
+    hide(){d.classList.remove('on')}
+  };
+}
+function ttHead(d,text){h('div','tt-h',d,text)}
+function ttRow(d,color,kind,value,name){
+  const r=h('div','row',d);
+  const k=h('span',kind==='rect'?'key-rect':'key-line',r);k.style.color=color;
+  h('b',null,r,value);h('span','n',r,name);return r;
+}
+function ttFoot(d,text){h('div','foot',d,text)}
+// tabla
+function buildTable(wrap,headers,rows){
+  wrap.replaceChildren();
+  const t=h('table','data',wrap);const th=h('thead',null,t);const tr=h('tr',null,th);
+  headers.forEach(x=>h('th',null,tr,x));
+  const tb=h('tbody',null,t);
+  rows.forEach(r=>{const row=h('tr',null,tb);r.forEach(c=>h('td',null,row,c))});
+}
+function wireFooter(tblBtn,wrap,getTable){
+  tblBtn.addEventListener('click',()=>{
+    const on=!wrap.classList.contains('on');
+    if(on){const t=getTable();buildTable(wrap,t.headers,t.rows)}
+    wrap.classList.toggle('on',on);tblBtn.textContent=on?'Ocultar tabla':'Ver tabla';
+    tblBtn.setAttribute('aria-expanded',on);
+  });
+}
+function segmented(container,options,value,onChange){
+  container.replaceChildren();
+  options.forEach(o=>{
+    const b=h('button',null,container,o.label);b.type='button';
+    b.setAttribute('aria-pressed',o.value===value);
+    b.addEventListener('click',()=>{
+      [...container.children].forEach(c=>c.setAttribute('aria-pressed','false'));
+      b.setAttribute('aria-pressed','true');onChange(o.value);
+    });
+  });
+}
+function onResize(elm,fn){
+  let w=0;const ro=new ResizeObserver(()=>{const nw=elm.clientWidth;if(Math.abs(nw-w)>1){w=nw;fn()}});ro.observe(elm);
+}
+// evita choques de etiquetas en el margen derecho
+function spreadLabels(items,minGap,top,bottom){
+  items.sort((a,b)=>a.y-b.y);
+  for(let i=1;i<items.length;i++){if(items[i].ly<items[i-1].ly+minGap)items[i].ly=items[i-1].ly+minGap}
+  const over=items.length?items[items.length-1].ly-bottom:0;
+  if(over>0){items[items.length-1].ly-=over;for(let i=items.length-2;i>=0;i--){if(items[i].ly>items[i+1].ly-minGap)items[i].ly=items[i+1].ly-minGap}}
+  items.forEach(it=>{if(it.ly<top)it.ly=top});
+  return items;
+}
+function axisNum(t,step){
+  const dec=step<1?(step<0.1?2:1):0;
+  const s=new Intl.NumberFormat('es-AR',{minimumFractionDigits:dec,maximumFractionDigits:dec}).format(Math.abs(t));
+  return (t<0?'−':'')+s;
+}
+
+(function(){
+const Q=DATA.quarters, M=DATA.monthly, META=DATA.meta;
+const st={mode:'qq'};
+const qLong=q=>`${q.q}.º trimestre ${q.y}`;
+const qMeses=q=>MES3[(q.q-1)*3]+'–'+MES3[(q.q-1)*3+2];
+const qOf=d=>{const y=+d.slice(0,4),m=+d.slice(5);return Q.find(q=>q.y===y&&q.q===Math.floor((m-1)/3)+1)};
+// recesiones: tramos de 2+ trimestres consecutivos con caída s.e.
+const runs=[];let cur=null;
+Q.forEach((q,i)=>{if(q.qq!=null&&q.qq<0){if(!cur)cur={a:i,b:i};else cur.b=i}else{if(cur&&cur.b>cur.a)runs.push(cur);cur=null}});
+if(cur&&cur.b>cur.a)runs.push(cur);
+const inRun=i=>runs.some(r=>i>=r.a&&i<=r.b);
+const L=Q[Q.length-1], P=Q[Q.length-2];
+
+// tiles
+const tiles=document.getElementById('tiles');
+[[P.qq,`${P.k} vs. ${Q[Q.length-3].k}`,'Desestacionalizado'],
+ [L.qq,`${L.k} vs. ${P.k}`,'Desestacionalizado'],
+ [L.yy,`${L.k} vs. ${Q[Q.length-5].k}`,'Interanual, serie original']].forEach(([v,lab,sub])=>{
+  const t=h('div','tile',tiles);h('div','lab',t,lab);
+  const val=h('div','val',t);const r=r1(v);
+  const dir=h('span','dir',val,r>0?'▲':(r<0?'▼':'■'));dir.setAttribute('aria-hidden','true');
+  dir.style.color=r>0?'var(--pos)':(r<0?'var(--neg)':'var(--muted)');
+  val.appendChild(document.createTextNode(pct(v)));h('div','sub',t,sub);
+});
+
+const legA=document.getElementById('legendA');
+function drawLegA(){
+  legA.replaceChildren();
+  [['var(--pos)','Suba'],['var(--neg)','Caída']].forEach(([c,t])=>{const s=h('span','li',legA);const k=h('span','key-rect',s);k.style.color=c;h('span',null,s,t)});
+  const s=h('span','li',legA);const k=h('span','key-rect',s);k.style.color='var(--band)';k.style.background='var(--band)';k.style.outline='1px solid var(--border)';
+  h('span',null,s,'Recesión técnica (2+ trimestres de caída s.e.)');
+}
+drawLegA();
+segmented(document.getElementById('mode'),[{label:'Trimestre anterior (s.e.)',value:'qq'},{label:'Igual trimestre año anterior',value:'yy'}],st.mode,v=>{st.mode=v;renderA()});
+
+// ---------- Panel A: barras trimestrales ----------
+const cA=document.getElementById('chartA');const ttA=Tooltip(cA);let svgA;
+function bandsAndYears(svg,W,H,mg,n,slot,labelBands,yearsY){
+  const g=el('g',null,svg);
+  runs.forEach((r,j)=>{
+    const x0=mg.l+slot*r.a, x1=mg.l+slot*(r.b+1);
+    el('rect',{x:x0,y:mg.t-22,width:x1-x0,height:H-mg.b-mg.t+22,fill:'var(--band)'},g);
+    if(labelBands){
+      el('text',{x:x0+6,y:mg.t-8,class:'annot-b'},g,(x1-x0)>118?'Recesión técnica':'Recesión');
+    }
+  });
+  return g;
+}
+function renderA(){
+  const W=cA.clientWidth;if(!W)return;const narrow=W<560;
+  const H=Math.round(Math.max(280,Math.min(400,W*.4)));
+  const mg={l:narrow?34:42,r:12,t:36,b:46};
+  const n=Q.length,pw=W-mg.l-mg.r,ph=H-mg.t-mg.b,slot=pw/n,cx=i=>mg.l+slot*(i+.5);
+  const key=st.mode;const vals=Q.map(q=>q[key]).filter(v=>v!=null);
+  const dom=niceDomain(Math.min(0,...vals),Math.max(0,...vals),narrow?4:6);
+  const y=v=>mg.t+ph*(1-(v-dom.lo)/(dom.hi-dom.lo));
+  if(svgA)svgA.remove();
+  svgA=el('svg',{viewBox:`0 0 ${W} ${H}`,height:H,role:'img',tabindex:0,'aria-label':'Variación trimestral del EMAE. Usá las flechas para recorrer los trimestres.'});
+  cA.insertBefore(svgA,ttA.el);
+  bandsAndYears(svgA,W,H,mg,n,slot,true);
+  const gG=el('g',null,svgA),gD=el('g',null,svgA),gL=el('g',null,svgA);
+  dom.ticks.forEach(t=>{
+    el('line',{x1:mg.l,x2:W-mg.r,y1:y(t),y2:y(t),stroke:'var(--grid)','shape-rendering':'crispEdges'},gG);
+    el('text',{x:mg.l-8,y:y(t)+4,'text-anchor':'end',class:'tick'},gG,axisNum(t,dom.st));
+  });
+  el('text',{x:mg.l-8,y:mg.t-22,'text-anchor':'end',class:'tick'},gG,'%');
+  el('line',{x1:mg.l,x2:W-mg.r,y1:y(0),y2:y(0),stroke:'var(--axis)','shape-rendering':'crispEdges'},gG);
+  // ejes x
+  Q.forEach((q,i)=>{
+    el('text',{x:cx(i),y:H-mg.b+17,'text-anchor':'middle',class:'tick'},gG,q.q+'T');
+    if(q.q===1&&i>0)el('line',{x1:mg.l+slot*i,x2:mg.l+slot*i,y1:H-mg.b+4,y2:H-mg.b+36,stroke:'var(--grid)','shape-rendering':'crispEdges'},gG);
+  });
+  [...new Set(Q.map(q=>q.y))].forEach(yr=>{
+    const ix=Q.map((q,i)=>q.y===yr?i:-1).filter(i=>i>=0);
+    el('text',{x:(cx(ix[0])+cx(ix[ix.length-1]))/2,y:H-mg.b+35,'text-anchor':'middle',class:'yr'},gG,yr);
+  });
+  const w=Math.min(24,slot*.56);
+  const ok=Q.map((q,i)=>i).filter(i=>Q[i][key]!=null);
+  const mn=ok.reduce((a,i)=>Q[i][key]<Q[a][key]?i:a,ok[0]), mx=ok.reduce((a,i)=>Q[i][key]>Q[a][key]?i:a,ok[0]);
+  const bars=[];
+  Q.forEach((q,i)=>{
+    const v=q[key];
+    if(v==null){el('text',{x:cx(i),y:y(0)-8,'text-anchor':'middle',class:'tick'},gD,'s/d');bars.push(null);return}
+    const p=el('path',{d:colPath(cx(i)-w/2,w,y(0),y(v),4),fill:v>=0?'var(--pos)':'var(--neg)'},gD);bars.push(p);
+    const lastRun=runs.length?runs[runs.length-1]:null;
+    const lab=narrow?(i===n-1||(key==='qq'&&lastRun&&i>=lastRun.a)):(key==='qq'?(v<0||i===n-1):(i===n-1||i===mn||i===mx));
+    if(lab){const ly=v>=0?y(v)-7:y(v)+15;el('text',{x:cx(i),y:ly,'text-anchor':'middle',class:'dlabel halo'},gL,pct(v))}
+  });
+  const cross=el('rect',{y:mg.t-22,height:H-mg.b-mg.t+22,width:slot,fill:'var(--ink)',opacity:0},svgA);
+  svgA.insertBefore(cross,gD);
+  const hit=el('rect',{x:mg.l,y:mg.t-22,width:pw,height:H-mg.t+22,fill:'transparent'},svgA);
+  let hov=null;
+  function show(i,px,py){
+    hov=i;const q=Q[i];cross.setAttribute('x',mg.l+slot*i);cross.setAttribute('opacity',.05);
+    bars.forEach((b,j)=>b&&b.setAttribute('opacity',j===i?1:.55));
+    ttA.show(b=>{
+      ttHead(b,qLong(q)+' ('+qMeses(q)+')');
+      const c1=q.qq==null?'var(--muted)':(q.qq>=0?'var(--pos)':'var(--neg)'),c2=q.yy>=0?'var(--pos)':'var(--neg)';
+      ttRow(b,c1,'rect',pct(q.qq),'vs. trimestre anterior (s.e.)');
+      ttRow(b,c2,'rect',pct(q.yy),'vs. igual trimestre año anterior');
+      ttFoot(b,`Promedio índice s.e.: ${num(q.sa)}${inRun(i)?' · recesión técnica':''}`);
+    },px==null?cx(i):px,py==null?mg.t+30:py);
+  }
+  function clear(){hov=null;cross.setAttribute('opacity',0);bars.forEach(b=>b&&b.setAttribute('opacity',1));ttA.hide()}
+  hit.addEventListener('pointermove',ev=>{const r=svgA.getBoundingClientRect();const x=(ev.clientX-r.left)*W/r.width;
+    const i=Math.max(0,Math.min(n-1,Math.floor((x-mg.l)/slot)));const cr=cA.getBoundingClientRect();show(i,ev.clientX-cr.left,ev.clientY-cr.top)});
+  hit.addEventListener('pointerleave',clear);
+  svgA.addEventListener('keydown',ev=>{if(ev.key!=='ArrowLeft'&&ev.key!=='ArrowRight')return;ev.preventDefault();
+    let i=hov==null?n-1:hov+(ev.key==='ArrowRight'?1:-1);show(Math.max(0,Math.min(n-1,i)))});
+  svgA.addEventListener('blur',clear);
+}
+
+// ---------- Panel B: nivel mensual vs promedio trimestral ----------
+const legB=document.getElementById('legendB');
+[['var(--s1)','Índice mensual desestacionalizado'],['var(--s3)','Promedio del trimestre']].forEach(([c,t])=>{const s=h('span','li',legB);const k=h('span','key-line',s);k.style.color=c;h('span',null,s,t)});
+const cB=document.getElementById('chartB');const ttB=Tooltip(cB);let svgB;
+function renderB(){
+  const W=cB.clientWidth;if(!W)return;const narrow=W<560;
+  const H=Math.round(Math.max(280,Math.min(380,W*.38)));
+  const mg={l:narrow?34:42,r:narrow?58:96,t:30,b:46};
+  const n=M.length,pw=W-mg.l-mg.r,ph=H-mg.t-mg.b,slot=pw/n,cx=i=>mg.l+slot*(i+.5);
+  // runs en meses
+  const mRuns=runs.map(r=>({a:M.findIndex(m=>m.d===Q[r.a].months[0]),b:M.findIndex(m=>m.d===Q[r.b].months[2])}));
+  const vals=M.map(m=>m.sa);const dom=niceDomain(Math.min(...vals)-1,Math.max(...vals)+1,narrow?4:5);
+  const y=v=>mg.t+ph*(1-(v-dom.lo)/(dom.hi-dom.lo));
+  if(svgB)svgB.remove();
+  svgB=el('svg',{viewBox:`0 0 ${W} ${H}`,height:H,role:'img',tabindex:0,'aria-label':'EMAE desestacionalizado mensual y promedio trimestral.'});
+  cB.insertBefore(svgB,ttB.el);
+  const gBand=el('g',null,svgB);
+  mRuns.forEach(r=>el('rect',{x:mg.l+slot*r.a,y:mg.t-14,width:slot*(r.b-r.a+1),height:H-mg.b-mg.t+14,fill:'var(--band)'},gBand));
+  const gG=el('g',null,svgB),gD=el('g',null,svgB),gL=el('g',null,svgB),gH=el('g',null,svgB);
+  dom.ticks.forEach(t=>{el('line',{x1:mg.l,x2:W-mg.r,y1:y(t),y2:y(t),stroke:'var(--grid)','shape-rendering':'crispEdges'},gG);
+    el('text',{x:mg.l-8,y:y(t)+4,'text-anchor':'end',class:'tick'},gG,axisNum(t,dom.st))});
+  M.forEach((d,i)=>{const m=+d.d.slice(5);
+    if(m===1&&i>0)el('line',{x1:mg.l+slot*i,x2:mg.l+slot*i,y1:mg.t,y2:H-mg.b+36,stroke:'var(--grid)','shape-rendering':'crispEdges'},gG);
+    if(slot>=13||m%3===1)el('text',{x:cx(i),y:H-mg.b+17,'text-anchor':'middle',class:'tick'},gG,MES1[m-1])});
+  [...new Set(M.map(d=>d.d.slice(0,4)))].forEach(yr=>{const ix=M.map((d,i)=>d.d.startsWith(yr)?i:-1).filter(i=>i>=0);
+    el('text',{x:(cx(ix[0])+cx(ix[ix.length-1]))/2,y:H-mg.b+35,'text-anchor':'middle',class:'yr'},gG,yr)});
+  // escalones trimestrales
+  Q.forEach(q=>{const a=M.findIndex(m=>m.d===q.months[0]);
+    el('line',{x1:mg.l+slot*a+2,x2:mg.l+slot*(a+3)-2,y1:y(q.sa),y2:y(q.sa),stroke:'var(--s3)','stroke-width':2.5,'stroke-linecap':'round'},gD)});
+  el('path',{d:M.map((d,i)=>(i?'L':'M')+cx(i).toFixed(1)+','+y(d.sa).toFixed(1)).join(''),fill:'none',stroke:'var(--s1)','stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'},gD);
+  // anotaciones
+  const iJul=M.findIndex(m=>m.d==='2026-07'), q2=Q[Q.length-2], q3=Q[Q.length-1];
+  const a2=M.findIndex(m=>m.d===q2.months[0]);
+  const lyQ=Math.max(mg.t+2,y(Math.max(...M.slice(a2-3,a2+3).map(m=>m.sa)))-14);const xq=mg.l+slot*(a2+1.5);
+  el('path',{d:`M${xq},${lyQ+4}V${y(q2.sa)-3}`,stroke:'var(--axis)',fill:'none'},gL);
+  el('text',{x:xq,y:lyQ,'text-anchor':'middle',class:'dlabel halo'},gL,narrow?num(q2.sa):'Prom. 2T-26: '+num(q2.sa));
+  el('circle',{cx:cx(iJul),cy:y(M[iJul].sa),r:4.5,fill:'var(--s1)',stroke:'var(--surface)','stroke-width':2},gL);
+  el('text',{x:cx(iJul)-8,y:y(M[iJul].sa)+18,'text-anchor':'end',class:'annot halo'},gL,'Julio '+pct(M[iJul].sam)+' m/m');
+  // etiquetas finales en margen
+  const iL=n-1;const ends=[{y:y(M[iL].sa),ly:y(M[iL].sa),t:num(M[iL].sa)+(narrow?'':' sep'),x:cx(iL),dot:true},{y:y(q3.sa),ly:y(q3.sa),t:num(q3.sa)+(narrow?'':' prom. 3T'),x:mg.l+slot*n-2}];
+  el('circle',{cx:cx(iL),cy:y(M[iL].sa),r:4,fill:'var(--s1)',stroke:'var(--surface)','stroke-width':2},gL);
+  spreadLabels(ends,15,mg.t,H-mg.b);
+  ends.forEach(o=>{const lx=W-mg.r+10;
+    el('path',{d:`M${o.x+(o.dot?5:2)},${o.y}L${lx-3},${o.ly}`,stroke:'var(--axis)',fill:'none'},gL);
+    el('text',{x:lx,y:o.ly+4,class:'dlabel'},gL,o.t)});
+  // hover
+  const cross=el('line',{y1:mg.t,y2:H-mg.b,stroke:'var(--ink-2)',opacity:0,'shape-rendering':'crispEdges'},gH);
+  const dot=el('circle',{r:4.5,fill:'var(--s1)',stroke:'var(--surface)','stroke-width':2,opacity:0},gH);
+  const hit=el('rect',{x:mg.l,y:mg.t,width:pw,height:ph+mg.b-10,fill:'transparent'},svgB);
+  let hov=null;
+  function show(i,px,py){hov=i;const d=M[i],q=qOf(d.d);
+    cross.setAttribute('x1',cx(i));cross.setAttribute('x2',cx(i));cross.setAttribute('opacity',.5);
+    dot.setAttribute('cx',cx(i));dot.setAttribute('cy',y(d.sa));dot.setAttribute('opacity',1);
+    ttB.show(b=>{ttHead(b,mesLargo(d.d));ttRow(b,'var(--s1)','line',num(d.sa),'Índice s.e.');
+      ttRow(b,'var(--s3)','line',num(q.sa),'Promedio '+q.k);ttFoot(b,'Var. mensual s.e.: '+pct(d.sam))},px==null?cx(i):px,py==null?mg.t+30:py)}
+  function clear(){hov=null;cross.setAttribute('opacity',0);dot.setAttribute('opacity',0);ttB.hide()}
+  hit.addEventListener('pointermove',ev=>{const r=svgB.getBoundingClientRect();const x=(ev.clientX-r.left)*W/r.width;
+    const i=Math.max(0,Math.min(n-1,Math.floor((x-mg.l)/slot)));const cr=cB.getBoundingClientRect();show(i,ev.clientX-cr.left,ev.clientY-cr.top)});
+  hit.addEventListener('pointerleave',clear);
+  svgB.addEventListener('keydown',ev=>{if(ev.key!=='ArrowLeft'&&ev.key!=='ArrowRight')return;ev.preventDefault();
+    let i=hov==null?n-1:hov+(ev.key==='ArrowRight'?1:-1);show(Math.max(0,Math.min(n-1,i)))});
+  svgB.addEventListener('blur',clear);
+}
+onResize(cA,renderA);onResize(cB,renderB);renderA();renderB();
+
+const src=document.getElementById('source');
+src.append('Fuente: elaboración propia con datos del INDEC (EMAE, '+META.release+'). Variaciones calculadas sobre promedios trimestrales; el PIB oficial había marcado '+pct(META.pib2T26)+' en el 2T-26. ');
+const a=h('a',null,src,'Informe del INDEC');a.href=META.url;a.target='_blank';a.rel='noopener';
+wireFooter(document.getElementById('btnTbl'),document.getElementById('tbl'),()=>{
+  const headers=['Trimestre','Promedio índice s.e.','Var. % vs. trimestre anterior (s.e.)','Promedio índice original','Var. % interanual','Recesión técnica'];
+  const rows=Q.slice().reverse().map((q,j)=>{const i=Q.length-1-j;return [q.k+' ('+qMeses(q)+')',num(q.sa),pct(q.qq),num(q.o),pct(q.yy),inRun(i)?'Sí':'']});
+  return {headers,rows};
+});
+})();
+</script>
+</body>
+</html>
