@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ventas minoristas pymes</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f4f5f7; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #111827; display: flex; justify-content: center; padding: 24px; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06); padding: 28px 32px 20px; width: 100%; max-width: 920px; }
+  .tag { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #6b7280; }
+  h1 { font-size: 26px; margin: 4px 0 18px; font-weight: 700; letter-spacing: -.01em; }
+  .kpis { display: flex; flex-wrap: wrap; gap: 12px 40px; margin-bottom: 8px; }
+  .kpi .n { font-size: 40px; font-weight: 800; line-height: 1; color: #dc2626; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .kpi:not(:first-child) .n { font-size: 26px; color: #374151; margin-top: 14px; }
+  .kpi .l { font-size: 13px; color: #6b7280; margin-top: 4px; }
+  .leg { display: flex; gap: 18px; font-size: 13px; color: #374151; margin: 14px 0 0; }
+  .leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  .chart { position: relative; }
+  svg { display: block; width: 100%; height: auto; }
+  .tick { font-size: 12px; fill: #9ca3af; }
+  .grid { stroke: #eef0f3; }
+  .end { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tip { position: absolute; pointer-events: none; background: #111827; color: #fff; padding: 7px 10px; border-radius: 8px; font-size: 12px; white-space: nowrap; display: none; font-variant-numeric: tabular-nums; }
+  .tip b { display: block; margin-bottom: 2px; }
+  .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; font-size: 11.5px; color: #9ca3af; margin-top: 6px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px 24px; } .kpi .n, .kpi:not(:first-child) .n { font-size: 30px; margin-top: 0; } .kpi:nth-child(4) .n { color: #374151; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="tag">Pymes</div>
+  <h1>Ventas minoristas pymes</h1>
+  <div class="kpis"><div class="kpi"><div class="n">38 de 46</div><div class="l">meses con ventas menores al año anterior</div></div><div class="kpi"><div class="n">−28,5%</div><div class="l">peor mes · ene-24 vs ene-23</div></div><div class="kpi"><div class="n" style="color:#16a34a">+25,5%</div><div class="l">mejor mes · ene-25 vs ene-24</div></div><div class="kpi"><div class="n">−1,6%</div><div class="l">último dato · oct-26 vs oct-25</div></div></div>
+  <div class="leg"><span><i style="background:#dc2626"></i>Caída</span><span><i style="background:#16a34a"></i>Suba</span></div>
+  <div class="chart"><svg id="svg" viewBox="0 0 880 340" role="img" aria-label="Ventas minoristas pymes"></svg><div class="tip" id="tip"></div></div>
+  <div class="foot"><span>Variación % contra el mismo mes del año anterior · precios constantes</span><span>Fuente: CAME</span></div>
+</div>
+<script>
+const P = [["2023-01", -0.3], ["2023-02", -1.6], ["2023-03", -0.8], ["2023-04", -1.6], ["2023-05", -2.8], ["2023-06", -3.6], ["2023-07", -3.6], ["2023-08", -4.1], ["2023-09", -5.1], ["2023-10", -0.7], ["2023-11", -2.9], ["2023-12", -13.7], ["2024-01", -28.5], ["2024-02", -25.5], ["2024-03", -12.6], ["2024-04", -7.3], ["2024-05", -7.3], ["2024-06", -21.9], ["2024-07", -15.7], ["2024-08", -10.5], ["2024-09", -5.2], ["2024-10", 2.9], ["2024-11", -1.7], ["2024-12", 17.7], ["2025-01", 25.5], ["2025-02", 24.0], ["2025-03", 10.5], ["2025-04", 3.7], ["2025-05", -2.9], ["2025-06", -0.5], ["2025-07", -2.0], ["2025-08", -2.6], ["2025-09", -4.2], ["2025-10", -1.4], ["2025-11", -4.1], ["2025-12", -5.2], ["2026-01", -4.8], ["2026-02", -5.6], ["2026-03", -0.6], ["2026-04", -3.2], ["2026-05", -1.2], ["2026-06", 0.9], ["2026-07", -3.8], ["2026-08", -0.2], ["2026-09", 0.3], ["2026-10", -1.6]];
+const W = 880, H = 340, M = { t: 16, r: 12, b: 28, l: 44 };
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg'), tip = document.getElementById('tip');
+const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const lab = (m) => { const [y, mm] = m.split('-'); return MES[+mm - 1] + '-' + y.slice(2); };
+const f1 = (v) => (v > 0 ? '+' : '') + v.toLocaleString('es-AR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).replace('-', '−') + '%';
+const el = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); svg.appendChild(e); return e; };
+const lo = -30, hi = 30;
+const Y = (v) => M.t + (hi - v) / (hi - lo) * (H - M.t - M.b);
+const bw = (W - M.l - M.r) / P.length;
+for (let v = lo; v <= hi; v += 10) {
+  el('line', { x1: M.l, x2: W - M.r, y1: Y(v), y2: Y(v), stroke: v === 0 ? '#9ca3af' : '#eef0f3' });
+  el('text', { x: M.l - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'tick' }).textContent = (v > 0 ? '+' : '') + v + '%';
+}
+P.forEach((p, i) => {
+  const x = M.l + i * bw, y0 = Y(0), y1 = Y(p[1]);
+  const r = el('rect', { x: x + bw * 0.15, width: bw * 0.7, y: Math.min(y0, y1), height: Math.max(1, Math.abs(y1 - y0)), rx: 2, fill: p[1] < 0 ? '#dc2626' : '#16a34a' });
+  if (p[0].endsWith('-01')) el('text', { x: x + bw / 2, y: H - 8, 'text-anchor': 'start', class: 'tick' }).textContent = p[0].slice(0, 4);
+  const hit = el('rect', { x, width: bw, y: M.t, height: H - M.t - M.b, fill: 'transparent' });
+  hit.addEventListener('pointermove', () => {
+    const k = svg.getBoundingClientRect().width / W;
+    tip.innerHTML = '<b>' + lab(p[0]) + '</b>' + f1(p[1]) + ' interanual';
+    tip.style.display = 'block';
+    let left = (x + bw) * k + 8; if (left + tip.offsetWidth > svg.getBoundingClientRect().width) left = x * k - tip.offsetWidth - 8;
+    tip.style.left = left + 'px'; tip.style.top = '8px';
+    r.setAttribute('opacity', 0.7);
+  });
+  hit.addEventListener('pointerleave', () => { tip.style.display = 'none'; r.setAttribute('opacity', 1); });
+});
+// notas
+const idx = (m) => P.findIndex((p) => p[0] === m);
+const note = (m, txt, dy) => { const i = idx(m); const p = P[i]; el('text', { x: M.l + i * bw + bw / 2, y: Y(p[1]) + dy, 'text-anchor': 'middle', class: 'tick' }).textContent = txt; };
+note('2025-01', 'rebote contra un 2024 muy bajo', -8);
+</script>
+</body>
+</html>
