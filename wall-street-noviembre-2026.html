@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wall Street en noviembre: la tecnología arrastró a los índices</title>
+<style>
+  :root{
+    --navy:#0F2A4A; --ink:#1A1A1A; --ink2:#4A4F57; --ink3:#7A808A;
+    --grid:#E3E6EA; --axis:#9AA1AB; --bg:#FFFFFF; --soft:#F4F6F8;
+    --sp:#1F4E9E; --dj:#D64B2A; --nq:#2B93B8;
+    --pos:#2F7D4F; --neg:#C0392B;
+  }
+  :root{color-scheme:light}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 18px 28px}
+  .topbar{display:flex;align-items:center;gap:10px;border-top:4px solid var(--navy);padding-top:10px}
+  .tag{background:var(--navy);width:34px;height:10px}
+  .kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);font-weight:700}
+  h1{font-size:24px;line-height:1.2;margin:10px 0 4px;font-weight:700;color:var(--ink)}
+  .dek{font-size:15px;line-height:1.4;color:var(--ink2);margin:0 0 16px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 18px}
+  .kpi{border-top:3px solid var(--c);padding:8px 2px 0}
+  .kpi .n{font-size:13px;color:var(--ink2);font-weight:500}
+  .kpi .v{font-size:24px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .kpi .s{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+  h2{font-size:17px;margin:22px 0 2px;font-weight:700}
+  .sub{font-size:13px;color:var(--ink2);margin:0 0 10px}
+  .controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin:6px 0 4px}
+  .seg{display:inline-flex;border:1px solid var(--axis);border-radius:4px;overflow:hidden}
+  .seg button{font:inherit;font-size:12.5px;padding:6px 11px;border:0;background:#fff;color:var(--ink2);cursor:pointer}
+  .seg button+button{border-left:1px solid var(--axis)}
+  .seg button.on{background:var(--navy);color:#fff}
+  .legend{display:flex;gap:14px;flex-wrap:wrap}
+  .legend button{font:inherit;font-size:13px;background:none;border:0;padding:4px 2px;cursor:pointer;color:var(--ink);display:flex;align-items:center;gap:6px}
+  .legend button i{display:inline-block;width:16px;height:3px;border-radius:2px;background:var(--c)}
+  .legend button.off{color:var(--ink3);text-decoration:line-through}
+  .legend button.off i{opacity:.25}
+  .chart{position:relative;width:100%}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .tt{position:absolute;pointer-events:none;background:#fff;border:1px solid #CDD2D8;border-radius:4px;
+      box-shadow:0 2px 8px rgba(0,0,0,.12);padding:8px 10px;font-size:12.5px;min-width:170px;opacity:0;transition:opacity .08s;z-index:3}
+  .tt .d{font-weight:700;margin-bottom:4px;color:var(--ink)}
+  .tt .r{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums;line-height:1.55}
+  .tt .r span:first-child{display:flex;align-items:center;gap:6px;color:var(--ink2)}
+  .tt .r i{width:9px;height:9px;border-radius:50%;background:var(--c);display:inline-block}
+  .tt .r b{font-weight:600}
+  .note{font-size:12px;color:var(--ink3);line-height:1.45;margin-top:14px;border-top:1px solid var(--grid);padding-top:8px}
+  .note b{color:var(--ink2);font-weight:600}
+  .tablebtn{font:inherit;font-size:12px;color:var(--navy);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;margin-top:6px}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:8px;font-variant-numeric:tabular-nums}
+  th,td{padding:4px 6px;text-align:right;border-bottom:1px solid var(--grid)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--ink2);font-weight:600}
+  .hidden{display:none}
+  .hint{font-size:12px;color:var(--ink3);margin:6px 0 0;display:flex;align-items:center;gap:6px}
+  .hdot{width:10px;height:10px;border-radius:50%;border:2px solid var(--navy);background:#fff;flex:none}
+  .tt.ev{max-width:290px;min-width:240px}
+  .tt .evtag{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--navy);margin-bottom:2px}
+  .tt .evt{font-size:14px;font-weight:700;line-height:1.25;margin-bottom:4px;color:var(--ink)}
+  .tt .evx{font-size:12.5px;line-height:1.45;color:var(--ink2);margin:0 0 7px;padding-bottom:7px;border-bottom:1px solid var(--grid)}
+  .tt b.up{color:var(--pos)} .tt b.dn{color:var(--neg)}
+  @media (max-width:520px){ h1{font-size:20px} .kpi .v{font-size:19px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div class="tag"></div><div class="kicker">Mercados · Wall Street</div></div>
+  <h1>Noviembre negro para la tecnología: el Nasdaq cae más de 7% en el mes</h1>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="controls">
+    <div class="legend" id="legend"></div>
+    <div class="seg" role="group" aria-label="Escala">
+      <button class="on" data-mode="pct">Variación %</button>
+      <button data-mode="lvl">Puntos</button>
+    </div>
+  </div>
+  <div class="chart" id="lineWrap"><svg id="line" aria-label="Gráfico de líneas de los índices en noviembre"></svg><div class="tt" id="tt1"></div></div>
+  <p class="hint"><span class="hdot"></span>Pasá el cursor (o tocá) sobre los puntos destacados para ver qué movió al mercado ese día.</p>
+
+  <h2>Cómo les fue a los sectores</h2>
+  <p class="sub">Variación en el último mes, en %</p>
+  <div class="chart" id="barWrap"><svg id="bars" aria-label="Gráfico de barras de variación sectorial"></svg><div class="tt" id="tt2"></div></div>
+
+  <button class="tablebtn" id="tblBtn">Ver datos en tabla</button>
+  <div id="tbl" class="hidden"></div>
+
+  <div class="note"><b>Fuente:</b> Reserva Federal de St. Louis (FRED), con datos de S&amp;P Dow Jones Indices y Nasdaq.</div>
+</div>
+
+<script>
+const SERIES=[
+  {k:"sp",name:"S&P 500",c:"var(--sp)",hex:"#1F4E9E"},
+  {k:"dj",name:"Dow Jones",c:"var(--dj)",hex:"#D64B2A"},
+  {k:"nq",name:"Nasdaq",c:"var(--nq)",hex:"#2B93B8"}
+];
+// fecha, S&P 500, Dow Jones, Nasdaq Composite
+const RAW=[
+ ["2026-10-30",7580.07,51770.31,25437.00],
+ ["2026-11-02",7541.40,51983.98,25164.31],
+ ["2026-11-03",7568.92,51786.72,25372.01],
+ ["2026-11-04",7688.62,53356.12,25736.51],
+ ["2026-11-05",7353.73,51523.06,24315.00],
+ ["2026-11-06",7376.86,51285.73,24579.43],
+ ["2026-11-09",7549.94,52389.75,25253.14],
+ ["2026-11-10",7520.93,52231.89,25065.87],
+ ["2026-11-11",7619.38,52486.49,25466.19],
+ ["2026-11-12",7592.40,52297.09,25366.09],
+ ["2026-11-13",7561.67,52347.55,25136.27],
+ ["2026-11-16",7416.59,51608.17,24509.76],
+ ["2026-11-17",7340.53,50759.42,24328.38],
+ ["2026-11-18",7323.63,50198.17,24429.88],
+ ["2026-11-19",7175.83,49097.06,23879.20],
+ ["2026-11-20",6910.39,48147.33,22617.73],
+ ["2026-11-23",7237.17,49595.31,24089.56],
+ ["2026-11-24",7201.09,50018.70,23733.54],
+ ["2026-11-25",7182.78,50182.95,23585.80]
+];
+const SECT=[
+ ["Consumo defensivo",5.68],["Inmobiliario",3.09],["Salud",2.65],["Servicios públicos",1.09],
+ ["Consumo discrecional",-0.07],["Financiero",-0.79],["Industriales",-4.77],
+ ["Comunicaciones",-5.99],["Materiales básicos",-8.17],["Energía",-11.88],["Tecnología",-17.15]
+];
+const EVENTS=[
+ {d:"2026-11-04",tag:"Elecciones",t:"Los demócratas ganan el Congreso",
+  x:"Tras las elecciones de medio término, el Dow Jones trepó 1.569 puntos (+3%), su mejor jornada post-legislativas desde 1982. La caída del petróleo ayudó, aunque las acciones de centros de datos bajaron por temor a más regulación sobre la IA."},
+ {d:"2026-11-05",tag:"Nvidia",t:"Derrumbe de los chips de IA",
+  x:"Nvidia se hundió 9,3% y perdió cerca de u$s450.000 millones de capitalización; Qualcomm sumó presión con una guía débil. El Nasdaq cayó 5,5%, su peor rueda desde abril de 2025, por temor a moratorias para nuevos centros de datos."},
+ {d:"2026-11-09",tag:"Rebote",t:"Rebote de las tecnológicas",
+  x:"Compras de oportunidad en semiconductores y una baja del petróleo impulsaron al S&P 500 (+2,3%). El Nasdaq 100 tuvo su mejor día desde marzo, pero Nvidia volvió a caer 4,3% tras revelarse una investigación interna sobre Jensen Huang."},
+ {d:"2026-11-12",tag:"Nvidia",t:"Renuncia Jensen Huang",
+  x:"Nvidia anunció la salida inmediata de su cofundador y CEO tras 33 años; la CFO Colette Kress quedó como CEO interina. La acción llegó a perder 14,3% en el día, aunque los índices cerraron con bajas menores a 0,4%."},
+ {d:"2026-11-16",tag:"Nvidia",t:"Nueva ola vendedora en chips",
+  x:"Nvidia volvió a caer ante versiones de que el directorio no evaluaba restituir a Huang. El índice de semiconductores SOX perdió 5,3% y arrastró al Nasdaq (−2,5%)."},
+ {d:"2026-11-18",tag:"Balance",t:"Nvidia supera las expectativas",
+  x:"El balance del tercer trimestre (publicado el 17 tras el cierre) superó lo esperado y anticipó ingresos por unos u$s130.000 millones para el próximo trimestre. El alivio fue breve: el S&P 500 encadenó su quinta baja."},
+ {d:"2026-11-19",tag:"Anthropic",t:"Anthropic debuta en el Nasdaq",
+  x:"La creadora de Claude colocó acciones a u$s83 —por encima del rango de 70-78— en la mayor salida a bolsa de la historia, con unos u$s81.000 millones recaudados. Abrió a u$s111,50 (+34%), pero el entusiasmo no alcanzó para sostener al mercado: el S&P 500 cayó 2%."},
+ {d:"2026-11-20",tag:"Corrección",t:"S&P 500 y Dow, en corrección",
+  x:"Nvidia se desplomó cerca de 13% ante informes de una investigación de la SEC por posibles irregularidades contables y Anthropic devolvió buena parte de su suba inicial. El S&P 500 (−3,7%) hilvanó siete bajas seguidas y cerró la semana con −8,6%; el Nasdaq (−5,3%) pasó a terreno negativo en el año."},
+ {d:"2026-11-23",tag:"Rebote",t:"Vuelve Huang y estalla el rebote",
+  x:"El directorio de Nvidia restituyó a Jensen Huang como CEO y la acción voló más de 31%. El S&P 500 subió 4,7% —la segunda mayor suba en puntos de su historia— y el Nasdaq, 6,5%: el mejor día desde abril de 2025."},
+ {d:"2026-11-25",tag:"Inflación",t:"PCE, aranceles y un susto intradiario",
+  x:"Un PCE subyacente más alto de lo esperado y un plan de nuevos aranceles a 14 socios comerciales llevaron al Nasdaq a caer 4,6% en la rueda. Las compras de la tarde moderaron la baja (−0,6%) y el Dow cerró en alza, sobre los 50.000 puntos."}
+];
+
+
+const MES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const DIAS=["dom","lun","mar","mié","jue","vie","sáb"];
+const pd=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
+const fmt=(v,d=2)=>v.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const sgn=v=>(v>0?"+":v<0?"−":"")+fmt(Math.abs(v));
+const dShort=s=>{const x=pd(s);return x.getDate()+" "+MES[x.getMonth()]};
+const dLong=s=>{const x=pd(s);return DIAS[x.getDay()]+" "+x.getDate()+" de "+["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][x.getMonth()]};
+
+const DATA=RAW.map(r=>({d:r[0],sp:r[1],dj:r[2],nq:r[3]}));
+const base=DATA[0];
+DATA.forEach(p=>SERIES.forEach(s=>p[s.k+"P"]=(p[s.k]/base[s.k]-1)*100));
+const last=DATA[DATA.length-1];
+
+// KPIs
+document.getElementById("kpis").innerHTML=SERIES.map(s=>`
+  <div class="kpi" style="--c:${s.c}">
+    <div class="n">${s.name}</div>
+    <div class="v">${sgn(last[s.k+"P"])}%</div>
+    <div class="s">${fmt(last[s.k])} puntos</div>
+  </div>`).join("");
+
+let mode="pct"; const vis={sp:true,dj:true,nq:true};
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+
+// Legend
+const lg=document.getElementById("legend");
+SERIES.forEach(s=>{
+  const b=document.createElement("button");b.style.setProperty("--c",s.c);
+  b.innerHTML=`<i></i>${s.name}`;b.setAttribute("aria-pressed","true");
+  b.onclick=()=>{ if(vis[s.k] && Object.values(vis).filter(Boolean).length===1) return;
+    vis[s.k]=!vis[s.k]; b.classList.toggle("off",!vis[s.k]); b.setAttribute("aria-pressed",vis[s.k]); drawLine(); };
+  lg.appendChild(b);
+});
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".seg button").forEach(x=>x.classList.toggle("on",x===b));
+  mode=b.dataset.mode;
+  drawLine();
+});
+
+function niceTicks(min,max,n){const span=max-min,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0)));
+  const step=[1,2,2.5,5,10].map(m=>m*mag).find(s=>span/s<=n)||10*mag;
+  const t=[];for(let v=Math.floor(min/step)*step;v<=max+1e-9;v+=step)t.push(+v.toFixed(6));return t}
+
+// curva monótona (sin sobrepasar los valores reales)
+function smoothPath(pts){
+  const n=pts.length; if(n<3) return pts.map((p,i)=>(i?"L":"M")+p[0]+","+p[1]).join("");
+  const dx=[],m=[],t=[];
+  for(let i=0;i<n-1;i++){dx[i]=pts[i+1][0]-pts[i][0];m[i]=(pts[i+1][1]-pts[i][1])/dx[i]}
+  t[0]=m[0]; t[n-1]=m[n-2];
+  for(let i=1;i<n-1;i++) t[i]= m[i-1]*m[i]<=0 ? 0 : 3*(dx[i-1]+dx[i])/((2*dx[i]+dx[i-1])/m[i-1]+(dx[i]+2*dx[i-1])/m[i]);
+  let d="M"+pts[0][0].toFixed(1)+","+pts[0][1].toFixed(1);
+  for(let i=0;i<n-1;i++){const h=dx[i]/3;
+    d+="C"+(pts[i][0]+h).toFixed(1)+","+(pts[i][1]+t[i]*h).toFixed(1)+" "+(pts[i+1][0]-h).toFixed(1)+","+(pts[i+1][1]-t[i+1]*h).toFixed(1)+" "+pts[i+1][0].toFixed(1)+","+pts[i+1][1].toFixed(1);}
+  return d;
+}
+
+function drawLine(){
+  const wrap=document.getElementById("lineWrap"), svg=document.getElementById("line");
+  const W=wrap.clientWidth, H=Math.max(300,Math.min(420,W*0.58)), narrow=W<520;
+  const M={t:16,r:narrow?62:86,b:30,l:narrow?36:42};
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML="";
+  const act=SERIES.filter(s=>vis[s.k]);
+  const val=(p,s)=> mode==="pct" ? p[s.k+"P"] : 100+p[s.k+"P"];
+  let lo=Infinity,hi=-Infinity; DATA.forEach(p=>act.forEach(s=>{const v=val(p,s);lo=Math.min(lo,v);hi=Math.max(hi,v)}));
+  if(mode==="pct"){lo=Math.min(lo,0);hi=Math.max(hi,0)} else {lo=Math.min(lo,100);hi=Math.max(hi,100)}
+  const pad=(hi-lo)*0.08; lo-=pad; hi+=pad;
+  const ticks=niceTicks(lo,hi,narrow?6:8); lo=Math.min(lo,ticks[0]); hi=Math.max(hi,ticks[ticks.length-1]);
+  const x=i=>M.l+(W-M.l-M.r)*i/(DATA.length-1), y=v=>M.t+(H-M.t-M.b)*(hi-v)/(hi-lo);
+  const zero= mode==="pct"?0:100;
+  const g=el("g",{},svg);
+  ticks.forEach(t=>{
+    el("line",{x1:M.l,x2:W-M.r,y1:y(t),y2:y(t),stroke:t===zero?"#1A1A1A":"var(--grid)","stroke-width":t===zero?1.2:1},g);
+    const tx=el("text",{x:M.l-6,y:y(t)+4,"text-anchor":"end","font-size":11.5,fill:"var(--ink3)"},g);
+    tx.textContent= mode==="pct" ? (t>0?"+":"")+fmt(t,t%1?1:0).replace("-","−") : fmt(t,0);
+  });
+  let lastLX=-1e9;
+  DATA.forEach((p,i)=>{
+    const dt=pd(p.d); if(!(i===0||dt.getDay()===1||i===DATA.length-1))return;
+    if(x(i)-lastLX < (narrow?44:52)) return;
+    if(i===DATA.length-1 && narrow) return;
+    lastLX=x(i);
+    el("line",{x1:x(i),x2:x(i),y1:H-M.b,y2:H-M.b+4,stroke:"var(--axis)"},g);
+    const tx=el("text",{x:x(i),y:H-M.b+17,"text-anchor":"middle","font-size":11.5,fill:"var(--ink3)"},g);
+    tx.textContent=dShort(p.d);
+  });
+  act.forEach(s=>{
+    el("path",{d:smoothPath(DATA.map((p,i)=>[x(i),y(val(p,s))])),fill:"none",stroke:s.hex,"stroke-width":2.2,"stroke-linejoin":"round","stroke-linecap":"round"},g);
+  });
+  const ends=act.map(s=>({s,v:val(last,s),y:y(val(last,s))})).sort((a,b)=>a.y-b.y);
+  for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<26) ends[i].y=ends[i-1].y+26;
+  ends.forEach(e=>{
+    el("circle",{cx:x(DATA.length-1),cy:y(e.v),r:3.5,fill:e.s.hex,stroke:"#fff","stroke-width":2},g);
+    const t1=el("text",{x:W-M.r+8,y:e.y-1,"font-size":11.5,"font-weight":700,fill:"var(--ink)"},g); t1.textContent=e.s.name;
+    const t2=el("text",{x:W-M.r+8,y:e.y+12,"font-size":11.5,fill:"var(--ink2)"},g);
+    t2.textContent= mode==="pct" ? sgn(e.v)+"%" : fmt(e.v,1);
+  });
+
+  // puntos destacados: sobre el índice que más se movió ese día
+  const dayChg=(i,s)=> i? (DATA[i][s.k]/DATA[i-1][s.k]-1)*100 : 0;
+  const evAt={};
+  EVENTS.forEach(n=>{
+    const i=DATA.findIndex(p=>p.d===n.d); if(i<0)return;
+    const s=act.reduce((a,b)=>Math.abs(dayChg(i,b))>Math.abs(dayChg(i,a))?b:a);
+    evAt[i]={n,mark:el("g",{},svg),cx:x(i),cy:y(val(DATA[i],s))};
+  });
+
+  const cross=el("line",{y1:M.t,y2:H-M.b,stroke:"#1A1A1A","stroke-width":1,opacity:0},svg);
+  const dots=act.map(s=>el("circle",{r:4.5,fill:s.hex,stroke:"#fff","stroke-width":2,opacity:0},svg));
+  const drawMarks=hi=>{ for(const i in evAt){const e=evAt[i],on=+i===hi; e.mark.innerHTML="";
+    el("circle",{cx:e.cx,cy:e.cy,r:on?9:6.5,fill:"#fff",stroke:"#0F2A4A","stroke-width":on?2.6:2},e.mark);
+    el("circle",{cx:e.cx,cy:e.cy,r:on?3.6:2.6,fill:"#0F2A4A"},e.mark);
+    svg.appendChild(e.mark);} };
+  drawMarks(-1);
+  const hit=el("rect",{x:M.l-6,y:0,width:W-M.l-M.r+12,height:H-M.b,fill:"transparent",style:"cursor:crosshair"},svg);
+  const tt=document.getElementById("tt1");
+  const move=ev=>{
+    const r=svg.getBoundingClientRect(), px=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
+    const sx=px*W/r.width; let i=Math.round((sx-M.l)/(W-M.l-M.r)*(DATA.length-1)); i=Math.max(0,Math.min(DATA.length-1,i));
+    const p=DATA[i], xi=x(i), e=evAt[i];
+    cross.setAttribute("x1",xi);cross.setAttribute("x2",xi);cross.setAttribute("opacity",e?.5:.3);
+    act.forEach((s,j)=>{dots[j].setAttribute("cx",xi);dots[j].setAttribute("cy",y(val(p,s)));dots[j].setAttribute("opacity",1)});
+    drawMarks(e?i:-1);
+    const rows=act.map(s=>{const d=i?dayChg(i,s):null;
+      return `<div class="r" style="--c:${s.c}"><span><i></i>${s.name}</span><b>${fmt(p[s.k])}</b></div>
+              <div class="r" style="font-size:11.5px;color:var(--ink3)"><span style="padding-left:15px">día ${d===null?"—":`<b class="${d>=0?'up':'dn'}">${sgn(d)}%</b>`}</span><span>mes ${sgn(p[s.k+"P"])}%</span></div>`}).join("");
+    tt.classList.toggle("ev",!!e);
+    tt.innerHTML= e
+      ? `<div class="evtag">${e.n.tag} · ${dLong(p.d)}</div><div class="evt">${e.n.t}</div><p class="evx">${e.n.x}</p>${rows}`
+      : `<div class="d">${dLong(p.d)}</div>${rows}`;
+    tt.style.opacity=1;
+    const tw=tt.offsetWidth, cx=xi*r.width/W;
+    let left= cx+14+tw>r.width ? cx-tw-14 : cx+14; if(left<0) left=Math.max(0,(r.width-tw)/2);
+    tt.style.left=left+"px"; tt.style.top=(M.t+4)+"px";
+  };
+  const out=()=>{tt.style.opacity=0;cross.setAttribute("opacity",0);dots.forEach(d=>d.setAttribute("opacity",0));drawMarks(-1)};
+  hit.addEventListener("mousemove",move); hit.addEventListener("touchstart",move,{passive:true});
+  hit.addEventListener("touchmove",move,{passive:true}); hit.addEventListener("mouseleave",out);
+}
+
+function drawBars(){
+  const wrap=document.getElementById("barWrap"), svg=document.getElementById("bars");
+  const W=wrap.clientWidth, narrow=W<520, rowH=26, M={t:8,r:16,b:26,l:narrow?128:158};
+  const H=M.t+M.b+SECT.length*rowH;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML="";
+  const lo=-20, hi=10, x=v=>M.l+(W-M.l-M.r)*(v-lo)/(hi-lo);
+  const g=el("g",{},svg);
+  for(let t=lo;t<=hi;t+=5){
+    el("line",{x1:x(t),x2:x(t),y1:M.t,y2:H-M.b,stroke:t===0?"#1A1A1A":"var(--grid)","stroke-width":t===0?1.2:1},g);
+    const tx=el("text",{x:x(t),y:H-M.b+16,"text-anchor":"middle","font-size":11.5,fill:"var(--ink3)"},g);
+    tx.textContent=(t>0?"+":"")+String(t).replace("-","−");
+  }
+  const tt=document.getElementById("tt2");
+  SECT.forEach(([n,v],i)=>{
+    const yy=M.t+i*rowH, bh=16, by=yy+(rowH-bh)/2;
+    const row=el("g",{style:"cursor:default"},g);
+    el("rect",{x:0,y:yy,width:W,height:rowH,fill:"transparent"},row);
+    const lab=el("text",{x:M.l-8,y:by+12,"text-anchor":"end","font-size":12.5,fill:"var(--ink)","font-weight":n==="Tecnología"?700:400},row); lab.textContent=n;
+    const x0=x(Math.min(0,v)), w=Math.max(1.5,Math.abs(x(v)-x(0)));
+    const bar=el("rect",{x:x0,y:by,width:w,height:bh,rx:2,fill:v>=0?"#2F7D4F":"#C0392B"},row);
+    const vt=el("text",{y:by+12,"font-size":11.5,fill:"var(--ink2)","font-variant-numeric":"tabular-nums"},row);
+    vt.textContent=sgn(v)+"%";
+    if(v>=0){vt.setAttribute("x",x(v)+5);vt.setAttribute("text-anchor","start")}
+    else{vt.setAttribute("x",x(v)-5);vt.setAttribute("text-anchor","end")}
+    if(v<0 && x(v)-M.l<46){vt.setAttribute("x",x(v)+6);vt.setAttribute("text-anchor","start");vt.setAttribute("fill","#fff");vt.setAttribute("font-weight",700)}
+    if(Math.abs(v)<0.2){vt.setAttribute("x",x(0)+5);vt.setAttribute("text-anchor","start")}
+    row.addEventListener("mouseenter",()=>{bar.setAttribute("opacity",.8);
+      const r=svg.getBoundingClientRect();
+      tt.innerHTML=`<div class="d">${n}</div><div class="r"><span>Variación en el mes</span><b>${sgn(v)}%</b></div>`;
+      tt.style.opacity=1; tt.style.left=Math.min(r.width-190,(x(Math.max(v,0))+12)*r.width/W)+"px"; tt.style.top=(yy*r.width/W-4)+"px";});
+    row.addEventListener("mouseleave",()=>{bar.setAttribute("opacity",1);tt.style.opacity=0});
+  });
+}
+
+// table
+document.getElementById("tblBtn").onclick=function(){
+  const t=document.getElementById("tbl"); const open=t.classList.toggle("hidden");
+  this.textContent= open ? "Ver datos en tabla" : "Ocultar tabla";
+  if(!t.innerHTML){
+    t.innerHTML=`<table><thead><tr><th>Fecha</th>${SERIES.map(s=>`<th>${s.name}</th><th>var. mes</th>`).join("")}</tr></thead><tbody>`+
+      DATA.map(p=>`<tr><td>${dShort(p.d)}</td>${SERIES.map(s=>`<td>${fmt(p[s.k])}</td><td>${sgn(p[s.k+"P"])}%</td>`).join("")}</tr>`).join("")+
+      `</tbody></table><table><thead><tr><th>Sector</th><th>Variación mensual</th></tr></thead><tbody>`+
+      SECT.map(([n,v])=>`<tr><td>${n}</td><td>${sgn(v)}%</td></tr>`).join("")+`</tbody></table>`;
+  }
+};
+
+const draw=()=>{drawLine();drawBars()};
+let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(draw,120)});
+draw();
+</script>
+</body>
+</html>
