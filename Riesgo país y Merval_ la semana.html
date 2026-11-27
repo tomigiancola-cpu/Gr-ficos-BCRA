@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riesgo país y Merval: la semana</title>
+<style>
+  :root{
+    color-scheme:light;
+    --navy:#0F2A4A; --ink:#1A1A1A; --ink2:#4A4F57; --ink3:#7A808A;
+    --grid:#E3E6EA; --axis:#9AA1AB; --bg:#FFFFFF;
+    --rp:#1F4E9E; --mp:#2B93B8; --mu:#1F4E9E;
+    --pos:#2F7D4F; --neg:#C0392B;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 18px 28px}
+  .topbar{display:flex;align-items:center;gap:10px;border-top:4px solid var(--navy);padding-top:10px}
+  .tag{background:var(--navy);width:34px;height:10px}
+  .kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);font-weight:700}
+  h1{font-size:24px;line-height:1.2;margin:10px 0 14px;font-weight:700}
+  .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 18px}
+  .kpi{font:inherit;text-align:left;color:inherit;background:#fff;border:0;border-top:3px solid var(--c);padding:8px 8px 8px;cursor:pointer;border-radius:0 0 4px 4px;transition:background .12s}
+  .kpi:hover{background:#F7F9FB}
+  .kpi.on{background:#F2F5F8}
+  .kpi:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+  .kpi .n{font-size:13px;color:var(--ink2);font-weight:500}
+  .kpi .v{font-size:24px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+  .kpi .s{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .kpi .s b.up{color:var(--pos)} .kpi .s b.dn{color:var(--neg)}
+  h2{font-size:17px;margin:24px 0 2px;font-weight:700}
+  .sub{font-size:13px;color:var(--ink2);margin:0 0 6px}
+  .controls{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 4px}
+  .picker{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0 0 10px}
+  .plabel{font-size:13px;font-weight:700;color:var(--ink)}
+  .seg{display:inline-flex;border:1.5px solid var(--navy);border-radius:6px;overflow:hidden;max-width:100%}
+  .seg button{font:inherit;font-size:13.5px;font-weight:500;padding:8px 14px;min-height:40px;border:0;background:#fff;color:var(--navy);cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .seg button+button{border-left:1.5px solid var(--navy)}
+  .seg button:hover{background:#EEF2F7}
+  .seg button.on{background:var(--navy);color:#fff}
+  .seg button i{width:10px;height:10px;border-radius:50%;border:2px solid currentColor;display:inline-block;flex:none}
+  .seg button.on i{background:#fff}
+  .seg button:focus-visible{outline:2px solid #2B93B8;outline-offset:-3px}
+  @media (max-width:520px){ .seg{width:100%} .seg button{flex:1;justify-content:center;padding:8px 6px;font-size:12.5px;white-space:normal;text-align:center;line-height:1.15} .seg button i{display:none} }
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .legend i{display:inline-block;width:16px;height:3px;border-radius:2px;background:var(--c)}
+  .chart{position:relative;width:100%}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .tt{position:absolute;pointer-events:none;background:#fff;border:1px solid #CDD2D8;border-radius:4px;
+      box-shadow:0 2px 8px rgba(0,0,0,.12);padding:8px 10px;font-size:12.5px;min-width:180px;opacity:0;transition:opacity .08s;z-index:3}
+  .tt .d{font-weight:700;margin-bottom:4px}
+  .tt .r{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums;line-height:1.55}
+  .tt .r span:first-child{display:flex;align-items:center;gap:6px;color:var(--ink2)}
+  .tt .r i{width:9px;height:9px;border-radius:50%;background:var(--c);display:inline-block}
+  .tt .r b{font-weight:600}
+  .tt .m{font-size:11.5px;color:var(--ink3)}
+  .tt b.up{color:var(--pos)} .tt b.dn{color:var(--neg)}
+  .tt .nd{font-size:11.5px;color:var(--ink3);font-style:italic}
+  .hint{font-size:12px;color:var(--ink3);margin:6px 0 0}
+  .note{font-size:12px;color:var(--ink3);line-height:1.45;margin-top:18px;border-top:1px solid var(--grid);padding-top:8px}
+  .note b{color:var(--ink2);font-weight:600}
+  @media (max-width:520px){ h1{font-size:20px} .kpi .v{font-size:19px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div class="tag"></div><div class="kicker">Mercados · Argentina</div></div>
+  <h1>El riesgo país perforó los 1.000 puntos y el Merval ganó 4,6% en dólares en la semana</h1>
+
+  <div class="kpis" id="kpis"></div>
+  <div class="picker">
+    <span class="plabel">Ver en el gráfico:</span>
+    <div class="seg" id="seg" role="tablist" aria-label="Indicador del gráfico"></div>
+  </div>
+  <p class="sub" id="sub"></p>
+  <div class="chart" id="w1"><svg id="c1" aria-label="Evolución diaria del indicador seleccionado"></svg><div class="tt" id="t1"></div></div>
+  <p class="hint">Pasá el cursor (o tocá) sobre el gráfico para ver el dato de cada día.</p>
+
+  <div class="note"><b>Fuente:</b> J.P. Morgan (riesgo país) y BYMA (S&amp;P Merval).</div>
+</div>
+
+<script>
+{
+const MES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const DIAS=["dom","lun","mar","mié","jue","vie","sáb"];
+const MESL=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const pd=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
+const fmt=(v,d=2)=>v.toLocaleString("es-AR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const sgn=(v,d=2)=>(v>0?"+":v<0?"−":"")+fmt(Math.abs(v),d);
+const dShort=s=>{const x=pd(s);return DIAS[x.getDay()]+" "+x.getDate()};
+const dLong=s=>{const x=pd(s);return DIAS[x.getDay()]+" "+x.getDate()+" de "+MESL[x.getMonth()]};
+const cls=v=>v>=0?"up":"dn";
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+
+// Días de la semana (más el cierre del viernes previo, derivado de las variaciones informadas)
+const DATES=["2026-11-20","2026-11-23","2026-11-24","2026-11-25","2026-11-26","2026-11-27"];
+const RP=[1070,1027,1096,1067,null,959];                 // pb · 26/11 sin dato (feriado en EE.UU.)
+const MP=[80977.0,null,81138.92,81643.14,84357.49,83719.00]; // pesos · 23/11 feriado en Argentina
+const MU=[45.00,null,45.18,45.89,46.01,47.06];            // dólares
+const NOTE={RP:{4:"Sin cotización: feriado de Acción de Gracias en EE.UU."},MP:{1:"Sin operaciones: feriado nacional en la Argentina"}};
+const first=a=>a[0], lastOf=a=>{for(let i=a.length-1;i>=0;i--)if(a[i]!=null)return a[i]};
+const prevOf=(a,i)=>{for(let j=i-1;j>=0;j--)if(a[j]!=null)return a[j];return null};
+
+// Indicadores (cada uno es una pestaña)
+const IND=[
+  {k:"RP",name:"Riesgo país",hex:"#1F4E9E",c:"var(--rp)",raw:RP,sub:"Riesgo país · en puntos básicos, cierre diario",
+   big:v=>fmt(v,0)+" pb", week:a=>{const d=lastOf(a)-a[0];return `semana <b class="${cls(-d)}">${sgn(d,0)} pb (${sgn((lastOf(a)/a[0]-1)*100,1)}%)</b>`},
+   y:t=>fmt(t,0), end:v=>fmt(v,0)+" pb", inv:true},
+  {k:"MP",name:"Merval en pesos",hex:"#2B93B8",c:"var(--mp)",raw:MP,sub:"S&P Merval en pesos · cierre diario",
+   big:v=>fmt(v,0), week:a=>{const d=(lastOf(a)/a[0]-1)*100;return `semana <b class="${cls(d)}">${sgn(d,1)}%</b>`},
+   y:t=>fmt(t,0), end:v=>fmt(v,0)},
+  {k:"MU",name:"Merval en dólares",hex:"#1F4E9E",c:"var(--mu)",raw:MU,sub:"S&P Merval en dólares · cierre diario",
+   big:v=>fmt(v,2), week:a=>{const d=(lastOf(a)/a[0]-1)*100;return `semana <b class="${cls(d)}">${sgn(d,1)}%</b>`},
+   y:t=>fmt(t,t%1?1:0), end:v=>"u$s "+fmt(v,2)}
+];
+let cur=0;
+const kp=document.getElementById("kpis");
+kp.innerHTML=IND.map((d,k)=>`<button class="kpi" role="tab" style="--c:${d.c}"><div class="n">${d.name}</div><div class="v">${d.big(lastOf(d.raw))}</div><div class="s">${d.week(d.raw)}</div></button>`).join("");
+const tiles=[...kp.querySelectorAll(".kpi")];
+tiles.forEach((b,k)=>{b.removeAttribute("role");b.title="Ver en el gráfico";b.onclick=()=>{cur=k;draw()}});
+const sg=document.getElementById("seg");
+sg.innerHTML=IND.map(d=>`<button role="tab"><i></i>${d.name}</button>`).join("");
+const tabs=[...sg.querySelectorAll("button")];
+tabs.forEach((b,k)=>b.onclick=()=>{cur=k;draw()});
+sg.addEventListener("keydown",e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;
+  cur=(cur+(e.key==="ArrowRight"?1:IND.length-1))%IND.length; draw(); tabs[cur].focus(); });
+
+function niceTicks(min,max,n){const span=max-min,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0)));
+  const step=[1,2,2.5,5,10].map(m=>m*mag).find(s=>span/s<=n)||10*mag;
+  const t=[];for(let v=Math.floor(min/step)*step;v<=max+1e-9;v+=step)t.push(+v.toFixed(6));return t}
+
+function smoothPath(pts){
+  const n=pts.length; if(n<3) return pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join("");
+  const dx=[],m=[],t=[];
+  for(let i=0;i<n-1;i++){dx[i]=pts[i+1][0]-pts[i][0];m[i]=(pts[i+1][1]-pts[i][1])/dx[i]}
+  t[0]=m[0]; t[n-1]=m[n-2];
+  for(let i=1;i<n-1;i++) t[i]= m[i-1]*m[i]<=0 ? 0 : 3*(dx[i-1]+dx[i])/((2*dx[i]+dx[i-1])/m[i-1]+(dx[i]+2*dx[i-1])/m[i]);
+  let d="M"+pts[0][0].toFixed(1)+","+pts[0][1].toFixed(1);
+  for(let i=0;i<n-1;i++){const h=dx[i]/3;
+    d+="C"+(pts[i][0]+h).toFixed(1)+","+(pts[i][1]+t[i]*h).toFixed(1)+" "+(pts[i+1][0]-h).toFixed(1)+","+(pts[i+1][1]-t[i+1]*h).toFixed(1)+" "+pts[i+1][0].toFixed(1)+","+pts[i+1][1].toFixed(1);}
+  return d;
+}
+
+/* Gráfico de líneas genérico.
+   series: [{name,hex,c,vals (para dibujar), raw (valores originales), notes}]  */
+function lineChart({wrapId,svgId,ttId,series,yFmt,endFmt,zero,tip,ratio=0.5}){
+  const wrap=document.getElementById(wrapId), svg=document.getElementById(svgId), tt=document.getElementById(ttId);
+  const W=wrap.clientWidth, H=Math.max(250,Math.min(360,W*ratio)), narrow=W<520;
+  const M={t:14,r:narrow?74:96,b:30,l:narrow?44:54};
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.innerHTML="";
+  let lo=Infinity,hi=-Infinity; series.forEach(s=>s.vals.forEach(v=>{if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v)}}));
+  if(zero!=null){lo=Math.min(lo,zero);hi=Math.max(hi,zero)}
+  const pad=(hi-lo)*0.12||1; lo-=pad; hi+=pad;
+  const ticks=niceTicks(lo,hi,narrow?5:6); lo=Math.min(lo,ticks[0]); hi=Math.max(hi,ticks[ticks.length-1]);
+  const N=DATES.length, x=i=>M.l+(W-M.l-M.r)*i/(N-1), y=v=>M.t+(H-M.t-M.b)*(hi-v)/(hi-lo);
+  const g=el("g",{},svg);
+  ticks.forEach(t=>{
+    const z=zero!=null&&Math.abs(t-zero)<1e-9;
+    el("line",{x1:M.l,x2:W-M.r,y1:y(t),y2:y(t),stroke:z?"#1A1A1A":"var(--grid)","stroke-width":z?1.2:1},g);
+    const tx=el("text",{x:M.l-6,y:y(t)+4,"text-anchor":"end","font-size":11.5,fill:"var(--ink3)"},g); tx.textContent=yFmt(t);
+  });
+  DATES.forEach((d,i)=>{
+    el("line",{x1:x(i),x2:x(i),y1:H-M.b,y2:H-M.b+4,stroke:"var(--axis)"},g);
+    const tx=el("text",{x:x(i),y:H-M.b+17,"text-anchor":"middle","font-size":11.5,fill:"var(--ink3)"},g);
+    tx.textContent= i===0 ? (narrow?"vie 20":"vie 20 (cierre previo)") : dShort(d);
+  });
+  series.forEach(s=>{
+    const pts=s.vals.map((v,i)=>v==null?null:[x(i),y(v)]).filter(Boolean);
+    // tramo punteado donde falta un día
+    s.vals.forEach((v,i)=>{ if(v==null){ const a=i-1,b=i+1; if(s.vals[a]!=null&&s.vals[b]!=null)
+      el("line",{x1:x(a),y1:y(s.vals[a]),x2:x(b),y2:y(s.vals[b]),stroke:s.hex,"stroke-width":1.6,"stroke-dasharray":"3 4",opacity:.7},g); }});
+    // tramos continuos suavizados
+    let seg=[]; const flush=()=>{ if(seg.length>1) el("path",{d:smoothPath(seg),fill:"none",stroke:s.hex,"stroke-width":2.4,"stroke-linecap":"round"},g); seg=[]; };
+    s.vals.forEach((v,i)=>{ if(v==null){ flush(); } else seg.push([x(i),y(v)]); }); flush();
+    pts.forEach(p=>el("circle",{cx:p[0],cy:p[1],r:3,fill:s.hex,stroke:"#fff","stroke-width":1.5},g));
+  });
+  // etiquetas finales
+  const ends=series.map(s=>{const v=lastOf(s.vals);return {s,v,y:y(v)}}).sort((a,b)=>a.y-b.y);
+  for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<26) ends[i].y=ends[i-1].y+26;
+  ends.forEach(e=>{
+    el("circle",{cx:x(N-1),cy:y(e.v),r:4.5,fill:e.s.hex,stroke:"#fff","stroke-width":2},g);
+    const t1=el("text",{x:W-M.r+9,y:e.y-1,"font-size":11.5,"font-weight":700,fill:"var(--ink)"},g); t1.textContent=e.s.name;
+    const t2=el("text",{x:W-M.r+9,y:e.y+12,"font-size":11.5,fill:"var(--ink2)"},g); t2.textContent=endFmt(e.v,e.s);
+  });
+  // hover
+  const cross=el("line",{y1:M.t,y2:H-M.b,stroke:"#1A1A1A","stroke-width":1,opacity:0},svg);
+  const dots=series.map(s=>el("circle",{r:5.5,fill:s.hex,stroke:"#fff","stroke-width":2,opacity:0},svg));
+  const hit=el("rect",{x:M.l-10,y:0,width:W-M.l-M.r+20,height:H-M.b,fill:"transparent",style:"cursor:crosshair"},svg);
+  const move=ev=>{
+    const r=svg.getBoundingClientRect(), px=((ev.touches?ev.touches[0].clientX:ev.clientX)-r.left)*W/r.width;
+    let i=Math.round((px-M.l)/(W-M.l-M.r)*(N-1)); i=Math.max(0,Math.min(N-1,i));
+    const xi=x(i); cross.setAttribute("x1",xi);cross.setAttribute("x2",xi);cross.setAttribute("opacity",.3);
+    series.forEach((s,j)=>{const v=s.vals[i]; if(v==null){dots[j].setAttribute("opacity",0);return}
+      dots[j].setAttribute("cx",xi);dots[j].setAttribute("cy",y(v));dots[j].setAttribute("opacity",1)});
+    tt.innerHTML=`<div class="d">${dLong(DATES[i])}${i===0?" · cierre previo":""}</div>`+series.map(s=>tip(s,i)).join("");
+    tt.style.opacity=1;
+    const tw=tt.offsetWidth, cx=xi*r.width/W;
+    let left= cx+14+tw>r.width ? cx-tw-14 : cx+14; if(left<0) left=Math.max(0,(r.width-tw)/2);
+    tt.style.left=left+"px"; tt.style.top=(M.t+4)+"px";
+  };
+  const out=()=>{tt.style.opacity=0;cross.setAttribute("opacity",0);dots.forEach(d=>d.setAttribute("opacity",0))};
+  hit.addEventListener("mousemove",move); hit.addEventListener("touchstart",move,{passive:true});
+  hit.addEventListener("touchmove",move,{passive:true}); hit.addEventListener("mouseleave",out);
+}
+
+function drawSel(){
+  const d=IND[cur], notes=NOTE[d.k==="RP"?"RP":"MP"];
+  tabs.forEach((b,k)=>{b.classList.toggle("on",k===cur);b.setAttribute("aria-selected",k===cur);b.tabIndex=k===cur?0:-1});
+  tiles.forEach((b,k)=>b.classList.toggle("on",k===cur));
+  document.getElementById("sub").textContent=d.sub;
+  lineChart({wrapId:"w1",svgId:"c1",ttId:"t1",ratio:0.5,
+    series:[{name:d.name,hex:d.hex,c:d.c,vals:d.raw,raw:d.raw}],
+    yFmt:d.y, endFmt:v=>d.end(v),
+    tip:(s,i)=>{const v=s.raw[i];
+      if(v==null) return `<div class="r" style="--c:${s.c}"><span><i></i>${s.name}</span><b>—</b></div><div class="nd">${notes[i]}</div>`;
+      const p=prevOf(s.raw,i), acc=(v/s.raw[0]-1)*100;
+      let day="—"; if(p!=null){ const pc=(v/p-1)*100;
+        day= d.inv ? `<b class="${cls(p-v)}">${sgn(v-p,0)} pb</b> · ${sgn(pc,1)}%` : `<b class="${cls(pc)}">${sgn(pc,1)}%</b>`; }
+      return `<div class="r" style="--c:${s.c}"><span><i></i>${s.name}</span><b>${d.end(v)}</b></div>
+              <div class="r m"><span style="padding-left:15px">día</span><span>${day}</span></div>
+              ${i?`<div class="r m"><span style="padding-left:15px">semana</span><span>${sgn(acc,1)}%</span></div>`:""}`;}
+  });
+}
+
+const draw=()=>drawSel();
+let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(draw,120)});
+draw();
+}
+</script>
+</body>
+</html>
